@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.opensmarthouse.ui</groupId>
+    <artifactId>org.opensmarthouse.ui.reactor</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+
+  <groupId>org.opensmarthouse.ui.features</groupId>
+  <artifactId>org.opensmarthouse.ui.features</artifactId>
+
+  <packaging>feature</packaging>
+
+  <name>OpenSmartHouse UI | Features</name>
+  <description>OpenSmartHouse UI Features</description>
+
+  <dependencies>
+    <!-- BOM, so features are build after bundles in parallel builds -->
+    <dependency>
+      <groupId>org.opensmarthouse.ui.bom</groupId>
+      <artifactId>org.opensmarthouse.ui.bom.opensmarthouse-ui</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.karaf.tooling</groupId>
+        <artifactId>karaf-maven-plugin</artifactId>
+        <version>${karaf.version}</version>
+        <extensions>true</extensions>
+        <configuration>
+          <startLevel>80</startLevel>
+          <aggregateFeatures>true</aggregateFeatures>
+          <checkDependencyChange>true</checkDependencyChange>
+          <failOnDependencyChange>false</failOnDependencyChange>
+          <logDependencyChanges>true</logDependencyChanges>
+          <overwriteChangedDependencies>true</overwriteChangedDependencies>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
