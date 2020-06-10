@@ -78,14 +78,14 @@ export default {
           label: 'Icon',
           groupName: 'icon',
           type: 'TEXT',
-          description: 'Use <code>oh:iconName</code> (<a class="external text-color-blue" target="_blank" href="https://www.openhab.org/docs/configuration/iconsets/classic/">openHAB icon</a>) or <code>f7:iconName</code> (<a class="external text-color-blue" target="_blank" href="https://framework7.io/icons/">Framework7 icon</a>)'
+          description: 'Use <code>oh:iconName</code> (<a class="external text-color-blue" target="_blank" href="https://www.openhab.org/docs/configuration/iconsets/classic/">OpenSmartHouse icon</a>) or <code>f7:iconName</code> (<a class="external text-color-blue" target="_blank" href="https://framework7.io/icons/">Framework7 icon</a>)'
         },
         {
           name: 'iconUseState',
           label: 'Use state to get icon',
           groupName: 'icon',
           type: 'BOOLEAN',
-          description: 'Pass the state of the item to get a dynamic icon (for openHAB icons only) - can cause the icon to flicker when the state changes'
+          description: 'Pass the state of the item to get a dynamic icon (for OpenSmartHouse icons only) - can cause the icon to flicker when the state changes'
         },
         {
           name: 'iconSize',

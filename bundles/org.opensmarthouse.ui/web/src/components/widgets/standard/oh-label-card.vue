@@ -111,13 +111,13 @@ export default {
           name: 'icon',
           label: 'Icon',
           type: 'TEXT',
-          description: 'Use <code>oh:iconName</code> (<a class="external text-color-blue" target="_blank" href="https://www.openhab.org/docs/configuration/iconsets/classic/">openHAB icon</a>) or <code>f7:iconName</code> (<a class="external text-color-blue" target="_blank" href="https://framework7.io/icons/">Framework7 icon</a>)'
+          description: 'Use <code>oh:iconName</code> (<a class="external text-color-blue" target="_blank" href="https://www.openhab.org/docs/configuration/iconsets/classic/">OpenSmartHouse icon</a>) or <code>f7:iconName</code> (<a class="external text-color-blue" target="_blank" href="https://framework7.io/icons/">Framework7 icon</a>)'
         },
         {
           name: 'iconColor',
           label: 'Icon Color',
           type: 'TEXT',
-          description: 'Not applicable to openHAB icons'
+          description: 'Not applicable to OpenSmartHouse icons'
         },
         {
           name: 'iconSize',

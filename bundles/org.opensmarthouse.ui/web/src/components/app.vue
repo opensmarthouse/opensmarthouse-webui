@@ -5,10 +5,10 @@
   <f7-panel v-show="ready" left :cover="showSidebar" class="sidebar" :visible-breakpoint="1024">
     <f7-page>
       <f7-link href="/" class="logo no-ripple" panel-close v-if="themeOptions.dark === 'dark'">
-        <div class="logo-inner"><img src="../res/img/openhab-logo-white.png" width="100%"></div>
+        <div class="logo-inner"><img src="../res/img/opensmarthouse-white.png" width="100%"></div>
       </f7-link>
       <f7-link href="/" class="logo no-ripple" panel-close v-else>
-        <div class="logo-inner"><img src="../res/img/openhab-logo.png" width="100%"></div>
+        <div class="logo-inner"><img src="../res/img/opensmarthouse-color.png" width="100%"></div>
       </f7-link>
       <f7-list v-if="ready">
         <f7-list-item v-if="!pages || !pages.length">
@@ -167,7 +167,7 @@
   .list
     margin-top 0
   .currentsection
-    background-color var(--f7-color-blue-tint)
+    background-color #329E28
     color var(--f7-color-white)
     --f7-list-chevron-icon-color var(--f7-color-white)
     .icon

@@ -3,13 +3,20 @@
 }
 
 .swagger-section #header {
-	background-color: #ff6600;
+	background-color: #25751D;
+    position: fixed;
+    top: 0;
+    width: 100%
 }
 
 .swagger-section #header a#logo {
-	padding-left: 124px;
+	padding-left: 120px;
 }
 
 .swagger-section #header form#api_selector .input a#explore {
-	background-color: #d2121c;
+	background-color: #329E28;
+}
+
+#swagger-ui-container {
+	margin-top: 30px;
 }

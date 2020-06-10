@@ -1,6 +1,6 @@
 {
     "name": "org.openhab.ui",
-    "displayName": "openHAB",
+    "displayName": "OpenSmartHouse",
     "version": "3.0.0",
     "description": "A sample Apache Cordova application that responds to the deviceready event.",
     "main": "index.js",

@@ -70,7 +70,7 @@
     <f7-block v-if="ready && !things.length" class="block-narrow">
       <empty-state-placeholder icon="lightbulb" title="things.title" text="things.text" />
     </f7-block>
-    <f7-fab position="right-bottom" slot="fixed" color="blue" href="add">
+    <f7-fab position="right-bottom" slot="fixed" color="#329E28" href="add">
       <f7-icon ios="f7:plus" md="material:add" aurora="f7:plus">
       </f7-icon>
       <!-- <f7-fab-buttons position="top">

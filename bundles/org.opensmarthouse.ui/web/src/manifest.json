@@ -1,7 +1,7 @@
 {
-  "name": "openHAB",
-  "short_name": "openHAB",
-  "description": "openHAB",
+  "name": "OpenSmartHouse",
+  "short_name": "OpenSmartHouse",
+  "description": "OpenSmartHouse",
   "lang": "en-US",
   "start_url": "/",
   "display": "standalone",

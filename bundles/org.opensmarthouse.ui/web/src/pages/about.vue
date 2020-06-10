@@ -4,13 +4,13 @@
     <f7-block class="block-narrow after-big-title">
       <f7-row>
         <f7-col>
-          <!-- <f7-block-title>About openHAB</f7-block-title> -->
+          <!-- <f7-block-title>About OpenSmartHouse</f7-block-title> -->
           <f7-block>
             <img src="res/icons/128x128.png" width="96" class="padding float-right">
-            <h2 class="block-title-medium">openHAB version {{this.$f7.version}}</h2>
-            <p><f7-link external target="_blank" href="https://www.openhab.org/">Home page</f7-link></p>
-            <p><f7-link external target="_blank" href="https://www.openhab.org/docs/">Documentation</f7-link></p>
-            <p><f7-link external target="_blank" href="https://community.openhab.org/">Community forum</f7-link></p>
+            <h2 class="block-title-medium">OpenSmartHouse version {{this.$f7.version}}</h2>
+            <p><f7-link external target="_blank" href="https://www.opensmarthouse.org/">Home page</f7-link></p>
+            <p><f7-link external target="_blank" href="https://www.opensmarthouse.org/docs/">Documentation</f7-link></p>
+            <p><f7-link external target="_blank" href="https://community.opensmarthouse.org/">Community forum</f7-link></p>
           </f7-block>
         </f7-col>
       </f7-row>
@@ -26,7 +26,7 @@
       <f7-col>
         <f7-list>
           <f7-list-button v-if="showCachePurgeOption" color="red" @click="purgeServiceWorkerAndCaches()">Purge Caches and Refresh</f7-list-button>
-          <f7-list-button color="blue" @click="reload">Reload the App</f7-list-button>
+          <f7-list-button color="#329E28" @click="reload">Reload the App</f7-list-button>
         </f7-list>
       </f7-col>
     </f7-block>

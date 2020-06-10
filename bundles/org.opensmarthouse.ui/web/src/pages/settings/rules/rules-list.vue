@@ -87,7 +87,7 @@
               :badge-color="(rule.status.status === 'RUNNING') ? 'orange' : (rule.status.status != 'IDLE') ? 'red' : ''"
             >
               <div slot="footer">
-                <f7-chip v-for="tag in rule.tags" :key="tag" :text="tag" media-bg-color="blue" style="margin-right: 6px">
+                <f7-chip v-for="tag in rule.tags" :key="tag" :text="tag" media-bg-color="#329E28" style="margin-right: 6px">
                   <f7-icon slot="media" ios="f7:tag_fill" md="material:label" aurora="f7:tag_fill" ></f7-icon>
                 </f7-chip>
               </div>
@@ -101,7 +101,7 @@
     <f7-block v-if="ready && !noRuleEngine && !rules.length" class="service-config block-narrow">
       <empty-state-placeholder icon="wand_rays" title="rules.title" text="rules.text" />
     </f7-block>
-    <f7-fab v-show="ready && !showCheckboxes" position="right-bottom" slot="fixed" color="blue" href="add">
+    <f7-fab v-show="ready && !showCheckboxes" position="right-bottom" slot="fixed" color="#329E28" href="add">
       <f7-icon ios="f7:plus" md="material:add" aurora="f7:plus"></f7-icon>
       <f7-icon ios="f7:close" md="material:close" aurora="f7:close"></f7-icon>
     </f7-fab>

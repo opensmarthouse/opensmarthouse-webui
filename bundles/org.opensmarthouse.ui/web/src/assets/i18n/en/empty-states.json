@@ -1,12 +1,12 @@
 {
-  "overview.title": "Welcome to openHAB!",
+  "overview.title": "Welcome to OpenSmartHouse!",
   "overview.text": "Configure your system, then create a layout page with the ID <code>\"overview\"</code> to display it here.",
 
   "inbox.title": "The Inbox is empty",
   "inbox.text": "Discovery results from your bindings that can be added as things will appear here.<br><br>You can also start a scan for a certain binding or add things manually with the button below.",
 
   "things.title": "No things yet",
-  "things.text": "Things are the devices and services connected to openHAB, they are provided by binding add-ons.<br><br>Installed bindings which support auto-discovery will add thing candidates to your Inbox. You can also start a scan for a certain binding or add your first thing manually with the button below.",
+  "things.text": "Things are the devices and services connected to OpenSmartHouse, they are provided by binding add-ons.<br><br>Installed bindings which support auto-discovery will add thing candidates to your Inbox. You can also start a scan for a certain binding or add your first thing manually with the button below.",
 
   "things.nobindings.title": "No bindings",
   "things.nobindings.text": "To add things to your system, you first need to install binding add-ons.",
@@ -18,7 +18,7 @@
   "items.text": "Items represent the functional side of your home - you can link them to the channels defined by your things. Start with the Model view to create a clean initial structure.<br><br>You can also define items with configuration files, or with the button below.",
 
   "items.add.title": "Define Items Above",
-  "items.add.text": "Use the openHAB item syntax to create new items or update them, as well as their metadata and links to channels. They will be stored in the internal database.",
+  "items.add.text": "Use the OpenSmartHouse item syntax to create new items or update them, as well as their metadata and links to channels. They will be stored in the internal database.",
 
   "pages.title": "No pages yet",
   "pages.text": "Design pages to display information in various ways and interact with your items. You can create several kinds of pages: charts, sitemaps, floor plans...<br><br>Click the button below to create your first page.",
@@ -33,7 +33,7 @@
   "rules.missingengine.text": "The rule engine must be installed before rules can be created.",
 
   "addons.title": "No add-ons installed",
-  "addons.text": "Add-ons add functionality to your openHAB system.<br><br>Install them with the button below.",
+  "addons.text": "Add-ons add functionality to your OpenSmartHouse system.<br><br>Install them with the button below.",
 
   "page.unavailable.title": "Page Unavailable",
   "page.unavailable.text": "You are not allowed to view this page because of visibility restrictions."

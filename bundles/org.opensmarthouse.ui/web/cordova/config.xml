@@ -1,13 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="org.openhab.ui" version="3.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>openHAB</name>
+    <name>OpenSmartHouse</name>
     <description>
-        This is a version of the openHAB user interface packaged as an app.
-        The open Home Automation Bus (openHAB) project aims at providing a universal integration platform for all things around home automation.
-        It is designed to be absolutely vendor-neutral as well as hardware/protocol-agnostic.
+        This is a version of the OpenSmartHouse user interface packaged as an app.
     </description>
-    <author email="info@openhab.org" href="https://openhab.org">
-        Contributors to the openHAB project
+    <author email="info@openhab.org" href="opensmarthouse">
+        Contributors to the OpenSmartHouse project
     </author>
     <content src="index.html" />
     <plugin name="cordova-plugin-whitelist" spec="1" />

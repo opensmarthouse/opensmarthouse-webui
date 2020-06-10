@@ -107,7 +107,7 @@
     <f7-block v-if="ready && !pages.length" class="service-config block-narrow">
       <empty-state-placeholder icon="tv" title="pages.title" text="pages.text" />
     </f7-block>
-    <f7-fab v-show="ready && !showCheckboxes" position="right-bottom" slot="fixed" color="blue">
+    <f7-fab v-show="ready && !showCheckboxes" position="right-bottom" slot="fixed" color="#329E28">
       <f7-icon ios="f7:plus" md="material:add" aurora="f7:plus"></f7-icon>
       <f7-icon ios="f7:multiply" md="material:close" aurora="f7:multiply"></f7-icon>
       <f7-fab-buttons position="top">

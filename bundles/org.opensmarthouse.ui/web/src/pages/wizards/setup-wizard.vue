@@ -49,7 +49,7 @@
               </f7-list-item>
             </f7-list>
             <f7-list>
-              <f7-list-button tab-link="#location" tab-link-active color="blue">
+              <f7-list-button tab-link="#location" tab-link-active color="#329E28">
                 <big>Next</big>
                 <f7-icon ios="f7:arrow_right" md="material:arrow_forward"/>
               </f7-list-button>
@@ -63,7 +63,7 @@
                 icon-if-ios="f7:arrow_left"
                 icon-if-md="material:arrow_back"
                 tab-link="#intro"
-                color="blue"
+                color="#329E28"
                 tab-link-active
               ></f7-link>
               <f7-login-screen-title>Set your location</f7-login-screen-title>
@@ -80,7 +80,7 @@
               <f7-list-input label="Latitude" type="text" disabled :value="lat"></f7-list-input>
             </f7-list>
             <f7-list>
-              <f7-list-button tab-link="#package" tab-link-active color="blue">
+              <f7-list-button tab-link="#package" tab-link-active color="#329E28">
                 <big>Next</big>
                 <f7-icon ios="f7:arrow_right" md="material:arrow_forward"/>
               </f7-list-button>
@@ -94,14 +94,14 @@
                 icon-if-ios="f7:arrow_left"
                 icon-if-md="material:arrow_back"
                 tab-link="#location"
-                color="blue"
+                color="#329E28"
                 tab-link-active
               ></f7-link>
               <f7-login-screen-title>Choose a startup package</f7-login-screen-title>
             </f7-block>
             <f7-block
               strong
-            >openHAB can be pre-configured with one of the following add-on packages as a starting point.</f7-block>
+            >OpenSmartHouse can be pre-configured with one of the following add-on packages as a starting point.</f7-block>
             <f7-list class="search-list searchbar-found">
               <f7-list-item
                 radio
@@ -142,7 +142,7 @@
               </f7-list-item>
             </f7-list>
             <f7-list>
-              <f7-list-button tab-link="#finish" tab-link-active color="blue">
+              <f7-list-button tab-link="#finish" tab-link-active color="#329E28">
                 <big>Next</big>
                 <f7-icon ios="f7:arrow_right" md="material:arrow_forward"/>
               </f7-list-button>
@@ -156,15 +156,15 @@
                 icon-if-ios="f7:arrow_left"
                 icon-if-md="material:arrow_back"
                 tab-link="#package"
-                color="blue"
+                color="#329E28"
                 tab-link-active
               ></f7-link>
               <f7-login-screen-title>Almost done!</f7-login-screen-title>
             </f7-block>
-            <f7-block strong>You're all set! Click Finish to configure openHAB with your options.</f7-block>
+            <f7-block strong>You're all set! Click Finish to configure OpenSmartHouse with your options.</f7-block>
 
             <f7-list>
-              <f7-list-button @click="configure()" tab-link-active color="blue">
+              <f7-list-button @click="configure()" tab-link-active color="#329E28">
                 <big>Finish</big>
               </f7-list-button>
               <f7-list-button title="Close" color="red" login-screen-close></f7-list-button>

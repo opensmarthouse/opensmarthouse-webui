@@ -57,7 +57,7 @@ export default {
           name: 'icon',
           label: 'Icon',
           type: 'TEXT',
-          description: 'Use <code>oh:iconName</code> (<a class="external text-color-blue" target="_blank" href="https://www.openhab.org/docs/configuration/iconsets/classic/">openHAB icon</a>)'
+          description: 'Use <code>oh:iconName</code> (<a class="external text-color-blue" target="_blank" href="https://www.openhab.org/docs/configuration/iconsets/classic/">OpenSmartHouse icon</a>)'
         }
       ]
     }

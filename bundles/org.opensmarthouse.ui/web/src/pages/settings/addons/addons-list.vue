@@ -34,7 +34,7 @@
             :title="addon.label"
           >
             <!-- <f7-swipeout-actions left>
-              <f7-swipeout-button v-if="addon.link" color="blue">Documentation</f7-swipeout-button>
+              <f7-swipeout-button v-if="addon.link" color="#329E28">Documentation</f7-swipeout-button>
               <f7-swipeout-button color="red">Uninstall</f7-swipeout-button>
             </f7-swipeout-actions> -->
             <!-- <f7-icon slot="media" icon="demo-list-icon"></f7-icon> -->
@@ -46,7 +46,7 @@
     <f7-block form v-if="ready && !addons.length" class="service-config block-narrow">
       <empty-state-placeholder :icon="addonsIcons[addonType]" :title="'No ' + addonsLabels[addonType] + ' installed yet'" text="addons.text" />
     </f7-block>
-    <f7-fab position="right-bottom" slot="fixed" color="blue" href="add">
+    <f7-fab position="right-bottom" slot="fixed" color="#329E28" href="add">
       <f7-icon ios="f7:plus" md="material:add" aurora="f7:plus"></f7-icon>
       <f7-icon ios="f7:close" md="material:close" aurora="f7:close"></f7-icon>
     </f7-fab>

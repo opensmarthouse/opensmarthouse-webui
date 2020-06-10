@@ -192,7 +192,7 @@ export default {
 .device-desktop .settings-menu
   --f7-list-item-footer-line-height 1.3
 .settings-menu .icon
-  color var(--f7-color-blue)
+  color #329E28
 .theme-filled .settings-menu .icon
   color var(--f7-color-gray) !important
 .aurora .settings-menu .icon

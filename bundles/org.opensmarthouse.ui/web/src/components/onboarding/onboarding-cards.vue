@@ -2,7 +2,7 @@
   <div>
     <f7-card
       v-show="showSetup"
-      title="Welcome to openHAB!"
+      title="Welcome to OpenSmartHouse!"
       content="Congratulations, your server is up and running! However, it is not configured yet. Follow the setup wizard and let it guide you through the initial configuration. (Note: the wizard could also be started automatically on launch if no package is detected - services/org.openhab.addons > package)."
     >
       <f7-card-footer>
@@ -32,7 +32,7 @@
               no-link-class
               color="blue"
               href="#"
-            >Connect to openHAB Cloud for remote access and integration with voice assistants</f7-link>
+            >Connect to OpenSmartHouse Cloud for remote access and integration with voice assistants</f7-link>
           </li>
         </ol>
       </f7-card-content>

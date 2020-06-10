@@ -25,7 +25,7 @@ import '../css/app.styl'
 // Import App Component
 import App from '../components/app.vue'
 
-// Import openHAB API helpers
+// Import OpenSmartHouse API helpers
 import openhab from './openhab/openhab.js'
 
 // Import AsyncComputed

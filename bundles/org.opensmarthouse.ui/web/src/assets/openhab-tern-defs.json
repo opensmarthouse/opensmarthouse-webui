@@ -93,11 +93,11 @@
       }
   },
   "events": {
-      "!doc": "Provides functionality to send commands to the openHAB event bus",
+      "!doc": "Provides functionality to send commands to the event bus",
       "!type": "ScriptBusEvent"
   },
   "itemRegistry": {
-      "!doc": "The Item Registry provides access to the list of openHAB items and their state",
+      "!doc": "The Item Registry provides access to the list of items and their state",
       "!type": "ItemRegistry"
   },
   "ir": {
