@@ -1,8 +1,8 @@
 {
-  "name": "openhab",
+  "name": "OpenSmartHouse",
   "version": "3.0.0",
-  "description": "openHAB",
-  "repository": "https://github.com/openhab/openhab-webui",
+  "description": "OpenSmartHouse",
+  "repository": "https://github.com/opensmarthouse/opensmarthouse-webui",
   "license": "EPL-2.0",
   "framework7": {
     "type": [
@@ -10,8 +10,8 @@
       "web",
       "pwa"
     ],
-    "name": "openHAB",
-    "pkg": "org.openhab.ui",
+    "name": "OpenSmartHouse",
+    "pkg": "org.opensmarthouse.ui",
     "platforms": [
       "ios",
       "android"
