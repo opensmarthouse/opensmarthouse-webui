@@ -18,7 +18,6 @@
 
   <modules>
     <module>org.opensmarthouse.ui</module>
-    <module>org.opensmarthouse.ui.restdocs</module>
   </modules>
 
   <dependencies>
