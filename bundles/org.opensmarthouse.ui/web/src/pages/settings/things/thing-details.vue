@@ -31,6 +31,13 @@
               <br>
               <div v-if="thing.statusInfo.description">{{thing.statusInfo.description}}</div>
             </div>
+
+            <div v-if="thing.thingTypeVersion == thingType.version">
+              <f7-icon slot="media" f7="exclamationmark_triangle" color="yellow"></f7-icon>
+              Thing definition is out of date and should be updated.
+              <f7-link icon-color="gray" icon-ios="f7:goforward" icon-md="f7:goforward" icon-aurora="f7:goforward" icon-size="16" color="orange" @click="updateThingType"></f7-link>
+            </div>
+
           </f7-col>
         </f7-block>
         <!-- skeletons for not ready -->
@@ -443,6 +450,21 @@ export default {
     onChannelsUpdated (save) {
       if (save) this.save(true)
       if (!this.eventSource) this.startEventSource()
+    },
+    updateThingType() {
+      this.$oh.api.put('/rest/things/' + this.thingId + '/migrate').then((data) => {
+        this.$f7.toast.create({
+          text: 'Thing type definition has been updated',
+          destroyOnClose: true,
+          closeTimeout: 2000
+        }).open()
+      }).catch((err) => {
+        this.$f7.toast.create({
+          text: 'Thing type update failed',
+          destroyOnClose: true,
+          closeTimeout: 2000
+        }).open()
+      })
     },
     unlinkAll (removeItems) {
       const message = (removeItems)
