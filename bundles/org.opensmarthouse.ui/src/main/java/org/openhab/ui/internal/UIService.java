@@ -21,8 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.openhab.core.config.core.ConfigConstants;
 import org.openhab.core.net.HttpServiceUtil;
+import org.opensmarthouse.core.OpenSmartHouse;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -46,7 +46,7 @@ public class UIService implements HttpContext {
 
     private static final String APP_BASE = "app";
     private static final String STATIC_PATH = "/static";
-    private static final String STATIC_BASE = ConfigConstants.getConfigFolder() + "/html";
+    private static final String STATIC_BASE = OpenSmartHouse.getConfigFolder() + "/html";
 
     private final Logger logger = LoggerFactory.getLogger(UIService.class);
 

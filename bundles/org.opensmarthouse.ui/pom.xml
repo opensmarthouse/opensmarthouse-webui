@@ -15,6 +15,11 @@
   <dependencies>
     <dependency>
       <groupId>org.opensmarthouse.core.bundles</groupId>
+      <artifactId>org.opensmarthouse.core.boot</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opensmarthouse.core.bundles</groupId>
       <artifactId>org.opensmarthouse.core.net</artifactId>
       <version>${project.version}</version>
     </dependency>
