@@ -11,7 +11,6 @@ import mixin from '../../widget-mixin'
 import { actionsMixin } from '../../widget-actions'
 import OhListItem from './oh-list-item.vue'
 import { OhLabelItemDefinition } from '@/assets/definitions/widgets/standard/listitems'
-
 export default {
   components: {
     OhListItem

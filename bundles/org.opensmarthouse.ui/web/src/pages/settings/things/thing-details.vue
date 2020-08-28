@@ -84,8 +84,8 @@
           <f7-col>
             <f7-block-title>Z-Wave</f7-block-title>
             <f7-list>
-              <f7-list-button color="blue" title="View Network Map" @click="zwaveNetworkPopupOpened = true"></f7-list-button>
-              <f7-list-button color="blue" v-for="action in zwaveActions" :key="action.name" :title="action.label" @click="doZWaveAction(action)"></f7-list-button>
+              <f7-list-button color="#329E28" title="View Network Map" @click="zwaveNetworkPopupOpened = true"></f7-list-button>
+              <f7-list-button color="#329E28" v-for="action in zwaveActions" :key="action.name" :title="action.label" @click="doZWaveAction(action)"></f7-list-button>
             </f7-list>
           </f7-col>
           <z-wave-network-popup :opened="zwaveNetworkPopupOpened" @closed="zwaveNetworkPopupOpened = false" />
@@ -120,9 +120,9 @@
           />
           <f7-col v-if="isExtensible || thing.channels.length > 0">
             <f7-list>
-              <f7-list-button class="searchbar-ignore" color="blue" title="Add Channel" v-if="isExtensible" @click="addChannel()"></f7-list-button>
-              <f7-list-button class="searchbar-ignore" color="blue" title="Add Equipment to Model" @click="addToModel(true)"></f7-list-button>
-              <f7-list-button class="searchbar-ignore" color="blue" title="Add Points to Model" @click="addToModel(false)"></f7-list-button>
+              <f7-list-button class="searchbar-ignore" color="#329E28" title="Add Channel" v-if="isExtensible" @click="addChannel()"></f7-list-button>
+              <f7-list-button class="searchbar-ignore" color="#329E28" title="Add Equipment to Model" @click="addToModel(true)"></f7-list-button>
+              <f7-list-button class="searchbar-ignore" color="#329E28" title="Add Points to Model" @click="addToModel(false)"></f7-list-button>
               <f7-list-button class="searchbar-ignore" color="red" title="Unlink all Items" @click="unlinkAll(false)"></f7-list-button>
               <f7-list-button class="searchbar-ignore" color="red" title="Unlink all and Remove Items" @click="unlinkAll(true)"></f7-list-button>
             </f7-list>
@@ -131,7 +131,7 @@
       </f7-tab>
     </f7-tabs>
 
-    <f7-fab position="right-bottom" color="blue" slot="fixed" @click="codePopupOpened = true">
+    <f7-fab position="right-bottom" slot="fixed" color="#329E28"  @click="codePopupOpened = true">
       <f7-icon ios="f7:document_text" md="material:assignment" aurora="f7:document_text"></f7-icon>
       <f7-icon ios="f7:close" md="material:close"></f7-icon>
     </f7-fab>

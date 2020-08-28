@@ -18,7 +18,6 @@
 import mixin from '../../widget-mixin'
 import OhListItem from './oh-list-item.vue'
 import { OhSliderItemDefinition } from '@/assets/definitions/widgets/standard/listitems'
-
 export default {
   components: {
     OhListItem

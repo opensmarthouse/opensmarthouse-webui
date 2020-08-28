@@ -81,7 +81,7 @@
               <oh-icon v-if="item.category" slot="media" :icon="item.category" height="32" width="32" />
               <span v-else slot="media" class="item-initial">{{item.name[0]}}</span>
               <f7-icon v-if="!item.editable" slot="after-title" f7="lock_fill" size="1rem" color="gray"></f7-icon>
-              <!-- <f7-button slot="after-start" color="blue" icon-f7="compose" icon-size="24px" :link="`${item.name}/edit`"></f7-button> -->
+              <!-- <f7-button slot="after-start" color="#329E28" icon-f7="compose" icon-size="24px" :link="`${item.name}/edit`"></f7-button> -->
             </f7-list-item>
           </ul>
         </f7-list>
@@ -90,7 +90,7 @@
     <f7-block v-if="ready && !items.length" class="service-config block-narrow">
       <empty-state-placeholder icon="square_on_circle" title="items.title" text="items.text" />
     </f7-block>
-    <f7-fab v-show="!showCheckboxes" position="right-bottom" slot="fixed" color="blue">
+    <f7-fab v-show="!showCheckboxes" position="right-bottom" slot="fixed" color="#329E28">
       <f7-icon ios="f7:plus" md="material:add" aurora="f7:plus"></f7-icon>
       <f7-icon ios="f7:multiply" md="material:close" aurora="f7:multiply"></f7-icon>
       <f7-fab-buttons position="top">

@@ -50,7 +50,8 @@
 
 <script>
 import mixin from '../../widget-mixin'
-import { actionGroup, actionProps, actionsMixin } from '../../widget-actions'
+import { actionsMixin } from '../../widget-actions'
+import { OhListItemDefinition } from '@/assets/definitions/widgets/standard/listitems'
 
 export default {
   name: 'oh-list-item',

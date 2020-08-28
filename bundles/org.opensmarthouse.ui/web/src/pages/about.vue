@@ -7,7 +7,7 @@
           <!-- <f7-block-title>About OpenSmartHouse</f7-block-title> -->
           <f7-block>
             <img src="res/icons/128x128.png" width="96" class="padding float-right">
-            <h2 v-if="$store.state.runtimeInfo" class="block-title-medium">openHAB {{$store.state.runtimeInfo.version}}<br/><small>{{$store.state.runtimeInfo.buildString}}</small></h2>
+            <h2 v-if="$store.state.runtimeInfo" class="block-title-medium">OpenSmartHouse {{$store.state.runtimeInfo.version}}<br/><small>{{$store.state.runtimeInfo.buildString}}</small></h2>
             <p><f7-link external target="_blank" href="https://www.opensmarthouse.org/">Home page</f7-link></p>
             <p><f7-link external target="_blank" href="https://www.opensmarthouse.org/docs/">Documentation</f7-link></p>
             <p><f7-link external target="_blank" href="https://community.opensmarthouse.org/">Community forum</f7-link></p>
@@ -26,13 +26,13 @@
                   <f7-list-item title="Operating System" :after="`${systemInfo.osName}/${systemInfo.osVersion} (${systemInfo.osArchitecture})`"></f7-list-item>
                   <f7-list-item title="Java Runtime" :footer="systemInfo.javaVendor" :after="`${systemInfo.javaVersion} (${systemInfo.javaVendorVersion})`">
                     <div slot="root-end" class="item-content" style="flex-direction: column">
-                      <f7-progressbar class="margin-top" style="width: 90%" color="blue" :progress="systemInfo.freeMemory * 100 / systemInfo.totalMemory" />
+                      <f7-progressbar class="margin-top" style="width: 90%" color="#329E28" :progress="systemInfo.freeMemory * 100 / systemInfo.totalMemory" />
                       <small class="margin-bottom text-color-gray">
                         {{systemInfo.availableProcessors}} available processors · {{Math.round(systemInfo.freeMemory / 1024 / 1024)}}/{{Math.round(systemInfo.totalMemory / 1024 / 1024)}}MB available memory<br />
                       </small>
                     </div>
                   </f7-list-item>
-                  <f7-list-button color="blue" @click="textualSystemInfoOpened = true">View details</f7-list-button>
+                  <f7-list-button color="#329E28" @click="textualSystemInfoOpened = true">View details</f7-list-button>
                 </f7-list>
               </f7-accordion-content>
             </f7-list-item>

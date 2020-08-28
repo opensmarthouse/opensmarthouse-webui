@@ -29,7 +29,7 @@
       </f7-col>
       <f7-col>
         <!-- <f7-list>
-          <f7-list-button color="blue" title="Edit Channel Links"></f7-list-button>
+          <f7-list-button color="#329E28" title="Edit Channel Links"></f7-list-button>
         </f7-list> -->
         <!-- <f7-list>
           <f7-list-button color="red" title="Delete this Item"></f7-list-button>

@@ -6,10 +6,10 @@
   "inbox.text": "Discovery results from your bindings that can be added as things will appear here.<br><br>You can also start a scan for a certain binding or add things manually with the button below.",
 
   "things.title": "No things yet",
-  "things.text": "Things are the devices and services connected to OpenSmartHouse, they are provided by binding add-ons.<br><br>Installed bindings which support auto-discovery will add thing candidates to your Inbox. You can also start a scan for a certain binding or add your first thing manually with the button below.",
+  "things.text": "Things are the devices and services connected to OpenSmartHouse, they are provided by binding extensions.<br><br>Installed bindings which support auto-discovery will add thing candidates to your Inbox. You can also start a scan for a certain binding or add your first thing manually with the button below.",
 
   "things.nobindings.title": "No bindings",
-  "things.nobindings.text": "To add things to your system, you first need to install binding add-ons.",
+  "things.nobindings.text": "To add things to your system, you first need to install binding extensions.",
 
   "model.title": "Start modelling your home",
   "model.text": "Build a model from your items to organize them and relate them to each other semantically.<br><br>Begin with a hierarchy of locations: buildings, outside areas, floors and rooms, as needed. Then, insert equipments and points from your things (or manually).",
@@ -32,8 +32,8 @@
   "rules.missingengine.title": "Rule engine not installed",
   "rules.missingengine.text": "The rule engine must be installed before rules can be created.",
 
-  "addons.title": "No add-ons installed",
-  "addons.text": "Add-ons add functionality to your OpenSmartHouse system.<br><br>Install them with the button below.",
+  "addons.title": "No extensions installed",
+  "addons.text": "Extensions add functionality to your OpenSmartHouse system.<br><br>Install them with the button below.",
 
   "page.unavailable.title": "Page Unavailable",
   "page.unavailable.text": "You are not allowed to view this page because of visibility restrictions."

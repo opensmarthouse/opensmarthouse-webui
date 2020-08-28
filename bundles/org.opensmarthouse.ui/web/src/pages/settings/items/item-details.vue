@@ -26,7 +26,7 @@
         <f7-col>
           <f7-block-title>Tags</f7-block-title>
           <f7-block strong class="tags-block">
-            <f7-chip v-for="tag in item.tags" :key="tag" :text="tag" media-bg-color="blue">
+            <f7-chip v-for="tag in item.tags" :key="tag" :text="tag" media-bg-color="#329E28">
               <f7-icon slot="media" ios="f7:tag_fill" md="material:label" aurora="f7:tag_fill" ></f7-icon>
             </f7-chip>
           </f7-block>

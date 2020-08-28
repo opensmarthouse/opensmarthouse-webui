@@ -50,7 +50,8 @@
 
 <script>
 import mixin from '../widget-mixin'
-import { actionGroup, actionProps, actionsMixin } from '../widget-actions'
+import { actionsMixin } from '../widget-actions'
+import { OhLabelCardDefinition } from '@/assets/definitions/widgets/standard/cards'
 
 export default {
   mixins: [mixin, actionsMixin],

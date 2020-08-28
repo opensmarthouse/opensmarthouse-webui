@@ -3,7 +3,7 @@
          <f7-tabs animated>
             <f7-tab id="intro" ref="intro" tab-active>
               <f7-login-screen-title>
-                <img class="intro-logo" src="res/img/openhab-logo.png">
+                <img class="intro-logo" src="res/img/opensmarthouse-color.png">
               </f7-login-screen-title>
               <f7-list form style="margin-top: 4rem" v-if="i18nReady">
                 <f7-list-item
@@ -110,20 +110,20 @@
                 ></f7-link>
                 <f7-login-screen-title>
                   <div class="padding"><f7-icon size="48" color="blue" f7="bag_badge_plus" /></div>
-                  Install Add-ons
+                  Install Extensions
                 </f7-login-screen-title>
               </f7-block>
               <f7-block
                 strong
               >
-                Most of openHAB's functionality is provided by add-ons.
-                Choose which ones you'd like to install right away.<br /><br />
-                <a class="text-color-blue external" target="_blank" href="https://next.openhab.org/addons/">Browse Add-ons on openhab.org</a>
+                Much of OpenSmartHouse's functionality is provided by extensions.
+                Choose the extensions you'd like to install right away.<br /><br />
+                <a class="text-color-blue external" target="_blank" href="https://opensmarthouse.org/extensions/">Browse Extensions at opensmarthouse.org</a>
               </f7-block>
               <f7-block class="padding">
                 <f7-row>
                   <f7-col width="100">
-                    <f7-button ref="selectAddons" large icon-f7="cart_fill" icon-size="24" @click="selectAddons" text="Select Add-ons to Install"></f7-button>
+                    <f7-button ref="selectAddons" large icon-f7="cart_fill" icon-size="24" @click="selectAddons" text="Select Extensions to Install"></f7-button>
                   </f7-col>
                 </f7-row>
                 <f7-list class="search-list searchbar-found" ref="selectAddons" media-list v-show="!installingAddons">
@@ -134,12 +134,12 @@
                 </f7-list>
                 <f7-block-footer class="margin-bottom">
                   <small>
-                    To optimize your system resources, install only the add-ons you need! Installing add-ons can take a while. Please be patient and stay on this page until the operation finishes.
+                    To optimize your system resources, install only the extensions you need! Installing extensions can take a while. Please be patient and stay on this page until the operation finishes.
                   </small>
                 </f7-block-footer>
                 <div>
                   <f7-button v-if="selectedAddons.length > 0" large fill color="blue" :text="`Install ${selectedAddons.length} Add-on${selectedAddons.length > 1 ? 's' : ''}`" @click="installAddons" />
-                  <f7-button large color="blue" text="Install Add-ons Later" class="margin-top" @click="skipAddons" />
+                  <f7-button large color="blue" text="Install Extensions Later" class="margin-top" @click="skipAddons" />
                 </div>
               </f7-block>
             </f7-tab>
@@ -158,7 +158,7 @@
                 <f7-login-screen-title class="text-color-gray">Please Wait...</f7-login-screen-title>
                 <div class="display-flex justify-content-center flex-direction-column text-align-center text-color-gray" style="margin-top: 4rem">
                   <div class="display-flex justify-content-center margin-bottom"><f7-preloader size="24"></f7-preloader></div>
-                  <div>It may take a few minutes to install the add-ons you selected.</div>
+                  <div>It may take a few minutes to install the extensions you selected.</div>
                 </div>
               </f7-block>
             </f7-tab>
@@ -174,7 +174,7 @@
                   color="blue"
                   tab-link-active
                 ></f7-link>-->
-                <f7-login-screen-title>Welcome to openHAB!</f7-login-screen-title>
+                <f7-login-screen-title>Welcome to OpenSmartHouse!</f7-login-screen-title>
               </f7-block>
 
               <f7-block class="display-flex flex-direction-column padding" style="margin-top: 4rem">
@@ -257,7 +257,7 @@ export default {
     skipSetup () {
       const self = this
       this.$f7.dialog.confirm(
-        `Are you sure? Setup saves you time by performing just a few basic configuration tasks. You should only skip it if you know what you're doing.`,
+        `Are you sure? Setup saves you time by performing the initial configuration tasks. You are advised to only skip setup if you are an experienced user.`,
         'Skip Setup',
         () => {
           self.$f7.panel.get('left').enableVisibleBreakpoint()
@@ -289,11 +289,11 @@ export default {
       const addonsCount = this.selectedAddons.length
       let progress = 0
 
-      const progressDialog = this.$f7.dialog.progress('Installing add-ons...', progress)
+      const progressDialog = this.$f7.dialog.progress('Installing extensions...', progress)
 
       const checkAddonStatus = function (addon) {
         return new Promise((resolve, reject) => {
-          self.$oh.api.get('/rest/addons/' + addon.id).then((data) => {
+          self.$oh.api.get('/rest/extensions/' + addon.id).then((data) => {
             if (data.installed) {
               console.log(`Add-on ${addon.id} installed!`)
               resolve(data)
@@ -324,7 +324,7 @@ export default {
         console.log('Installing add-on: ' + addon.id)
         progressDialog.setTitle(`Installing ${addon.label}...`)
 
-        self.$oh.api.post('/rest/addons/' + addon.id + '/install', {}, 'text').then((data) => {
+        self.$oh.api.post('/rest/extensions/' + addon.id + '/install', {}, 'text').then((data) => {
           const checkTimer = setInterval(() => {
             checkAddonStatus(addon).then((addon) => {
               clearInterval(checkTimer)
@@ -387,13 +387,13 @@ export default {
         this.i18nReady = true
       }
     })
-    this.$oh.api.get('/rest/addons').then((data) => {
+    this.$oh.api.get('/rest/extensions').then((data) => {
       this.addons = data
       const self = this
       this.autocompleteAddons = this.$f7.autocomplete.create({
         openIn: 'popup',
-        pageTitle: 'Select Add-ons to Install',
-        searchbarPlaceholder: 'Try: astro, mqtt, hue, knx...',
+        pageTitle: 'Select Extensions to Install',
+        searchbarPlaceholder: 'Try: zigbee, zwave, hue, knx...',
         openerEl: this.$refs.selectAddons,
         multiple: true,
         requestSourceOnOpen: true,
