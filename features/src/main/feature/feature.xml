@@ -16,12 +16,8 @@
 <features name="${project.artifactId}-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.4.0">
 
 	<feature name="opensmarthouse-ui-webui" description="Basic UI" version="${project.version}">
+		<feature>opensmarthouse-core-io-rest-ui</feature>
 		<bundle>mvn:org.opensmarthouse.ui.bundles/org.opensmarthouse.ui/${project.version}</bundle>
-	</feature>
-
-	<feature name="opensmarthouse-ui-restdocs" description="REST Documentation" version="${project.version}">
-		<feature>opensmarthouse-core-io-rest-swagger</feature>
-		<bundle>mvn:org.opensmarthouse.ui.bundles/org.opensmarthouse.ui.restdocs/${project.version}</bundle>
 	</feature>
 
 </features>
