@@ -103,7 +103,7 @@
       <f7-tab id="config" :disabled="!(thing.configuration && thingType.configParameters)" @tab:show="() => this.currentTab = 'config'" :tab-active="currentTab === 'config'">
         <f7-block v-if="currentTab === 'config'" class="block-narrow">
           <thing-general-settings :thing="thing" :thing-type="thingType" @updated="thingDirty = true" />
-          <config-sheet
+          <config-sheet ref="thingConfiguration"
             :parameter-groups="configDescriptions.parameterGroups"
             :parameters="configDescriptions.parameters"
             :configuration="thing.configuration"
@@ -335,6 +335,10 @@ export default {
         endpoint = '/rest/things/' + this.thingId
         payload = this.thing
         successMessage = 'Thing updated'
+      }
+      if (!this.$refs.thingConfiguration.isValid()) {
+        this.$f7.dialog.alert('Please review the configuration and correct validation errors')
+        return
       }
       this.$oh.api.put(endpoint, payload).then(data => {
         // this.$set(this, 'thing', data)
