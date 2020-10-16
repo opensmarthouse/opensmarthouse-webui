@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>org.opensmarthouse.ui</artifactId>
-  <name>OpenSmartHouse UI | Bundles | Main UI</name>
+  <name>OpenSmartHouse UI | Bundles | Web UI</name>
 
   <dependencies>
     <dependency>
