@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.opensmarthouse</groupId>
     <artifactId>parent</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>0.9.0-SNAPSHOT</version>
   </parent>
 
   <groupId>org.opensmarthouse.ui</groupId>
   <artifactId>org.opensmarthouse.ui.reactor</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>0.9.0-SNAPSHOT</version>
 
   <packaging>pom</packaging>
 
@@ -50,19 +49,38 @@
 
   <distributionManagement>
     <repository>
-      <id>bintray</id>
-      <url>${oh.repo.distBaseUrl}/openhab2-addons/;publish=1</url>
+      <id>${release.repository-id}</id>
+      <name>${release.repository-name}</name>
+      <url>${release.repository-url}</url>
     </repository>
     <snapshotRepository>
-      <id>jfrog</id>
-      <url>${oh.repo.snapshotBaseUrl}/libs-snapshot-local</url>
+      <id>${snapshot.repository-id}</id>
+      <name>${snapshot.repository-name}</name>
+      <url>${snapshot.repository-url}</url>
     </snapshotRepository>
   </distributionManagement>
 
   <properties>
+    <snapshot.repository-id>bintray-snapshots</snapshot.repository-id>
+    <snapshot.repository-name>Bintray Snapshots</snapshot.repository-name>
+    <snapshot.repository-url>https://oss.jfrog.org/artifactory/oss-snapshot-local/</snapshot.repository-url>
+
+    <release.repository-id>bintray-releases</release.repository-id>
+    <release.repository-name>Bintray Releases</release.repository-name>
+    <release.repository-url>https://api.bintray.com/maven/opensmarthouse/maven/opensmarthouse-webui/;publish=1</release.repository-url>
+
     <sat.version>0.10.0</sat.version>
     <spotless.version>2.0.3</spotless.version>
+    <spotless.check.skip>true</spotless.check.skip>
   </properties>
+
+  <repositories>
+    <repository>
+      <id>bintray-opensmarthouse-maven</id>
+      <name>bintray</name>
+      <url>https://dl.bintray.com/opensmarthouse/maven</url>
+    </repository>
+  </repositories>
 
   <build>
     <pluginManagement>
@@ -458,11 +476,11 @@ Import-Package: \\
                 <file>openhab_codestyle.xml</file>
                 <version>4.13.0</version>
               </eclipse>
-              <removeUnusedImports/>
+              <removeUnusedImports></removeUnusedImports>
               <importOrder>
                 <file>openhab.importorder</file>
               </importOrder>
-              <endWithNewline/>
+              <endWithNewline></endWithNewline>
             </java>
             <formats>
               <format>
@@ -481,8 +499,8 @@ Import-Package: \\
                   </files>
                   <version>4.13.0</version>
                 </eclipseWtp>
-                <trimTrailingWhitespace/>
-                <endWithNewline/>
+                <trimTrailingWhitespace></trimTrailingWhitespace>
+                <endWithNewline></endWithNewline>
               </format>
               <format>
                 <!-- pom.xml -->
@@ -496,8 +514,8 @@ Import-Package: \\
                   </files>
                   <version>4.13.0</version>
                 </eclipseWtp>
-                <trimTrailingWhitespace/>
-                <endWithNewline/>
+                <trimTrailingWhitespace></trimTrailingWhitespace>
+                <endWithNewline></endWithNewline>
               </format>
             </formats>
           </configuration>
