@@ -5,12 +5,12 @@
   <parent>
     <groupId>org.opensmarthouse</groupId>
     <artifactId>parent</artifactId>
-    <version>0.9.0-SNAPSHOT</version>
+    <version>0.9.0</version>
   </parent>
 
   <groupId>org.opensmarthouse.ui</groupId>
   <artifactId>org.opensmarthouse.ui.reactor</artifactId>
-  <version>0.9.0-SNAPSHOT</version>
+  <version>0.9.0</version>
 
   <packaging>pom</packaging>
 
@@ -38,7 +38,7 @@
   <scm>
     <connection>scm:git:https://github.com/opensmarthouse/opensmarthouse-webui.git</connection>
     <developerConnection>scm:git:https://github.com/opensmarthouse/opensmarthouse-webui.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>opensmarthouse-webui-0.9.0</tag>
     <url>https://github.com/opensmarthouse/opensmarthouse-webui</url>
   </scm>
 
@@ -170,7 +170,7 @@ Import-Package: \\
           <version>${bnd.version}</version>
           <configuration>
             <failOnChanges>false</failOnChanges>
-            <bndruns></bndruns>
+            <bndruns />
           </configuration>
           <executions>
             <execution>
@@ -400,7 +400,7 @@ Import-Package: \\
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <ignore></ignore>
+                    <ignore />
                   </action>
                 </pluginExecution>
                 <pluginExecution>
@@ -413,7 +413,7 @@ Import-Package: \\
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <ignore></ignore>
+                    <ignore />
                   </action>
                 </pluginExecution>
               </pluginExecutions>
@@ -476,11 +476,11 @@ Import-Package: \\
                 <file>openhab_codestyle.xml</file>
                 <version>4.13.0</version>
               </eclipse>
-              <removeUnusedImports></removeUnusedImports>
+              <removeUnusedImports />
               <importOrder>
                 <file>openhab.importorder</file>
               </importOrder>
-              <endWithNewline></endWithNewline>
+              <endWithNewline />
             </java>
             <formats>
               <format>
@@ -499,8 +499,8 @@ Import-Package: \\
                   </files>
                   <version>4.13.0</version>
                 </eclipseWtp>
-                <trimTrailingWhitespace></trimTrailingWhitespace>
-                <endWithNewline></endWithNewline>
+                <trimTrailingWhitespace />
+                <endWithNewline />
               </format>
               <format>
                 <!-- pom.xml -->
@@ -514,8 +514,8 @@ Import-Package: \\
                   </files>
                   <version>4.13.0</version>
                 </eclipseWtp>
-                <trimTrailingWhitespace></trimTrailingWhitespace>
-                <endWithNewline></endWithNewline>
+                <trimTrailingWhitespace />
+                <endWithNewline />
               </format>
             </formats>
           </configuration>
