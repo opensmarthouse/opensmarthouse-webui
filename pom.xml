@@ -10,7 +10,7 @@
 
   <groupId>org.opensmarthouse.ui</groupId>
   <artifactId>org.opensmarthouse.ui.reactor</artifactId>
-  <version>0.9.0</version>
+  <version>0.9.1-SNAPSHOT</version>
 
   <packaging>pom</packaging>
 
@@ -38,7 +38,7 @@
   <scm>
     <connection>scm:git:https://github.com/opensmarthouse/opensmarthouse-webui.git</connection>
     <developerConnection>scm:git:https://github.com/opensmarthouse/opensmarthouse-webui.git</developerConnection>
-    <tag>opensmarthouse-webui-0.9.0</tag>
+    <tag>HEAD</tag>
     <url>https://github.com/opensmarthouse/opensmarthouse-webui</url>
   </scm>
 
