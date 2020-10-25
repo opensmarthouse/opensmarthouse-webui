@@ -72,19 +72,6 @@
     <release.repository-url>https://api.bintray.com/maven/opensmarthouse/maven/opensmarthouse-webui/;publish=1</release.repository-url>
   </properties>
 
-  <repositories>
-    <repository>
-      <id>github-opensmarthouse-maven</id>
-      <name>OpenSmartHouse Maven Repository on GitHub</name>
-      <url>https://maven.pkg.github.com/opensmarthouse</url>
-    </repository>
-    <repository>
-      <id>bintray-opensmarthouse-maven</id>
-      <name>bintray</name>
-      <url>https://dl.bintray.com/opensmarthouse/maven</url>
-    </repository>
-  </repositories>
-
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -103,6 +90,19 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
+
+  <repositories>
+    <repository>
+      <id>github-opensmarthouse-maven</id>
+      <name>OpenSmartHouse Maven Repository on GitHub</name>
+      <url>https://maven.pkg.github.com/opensmarthouse</url>
+    </repository>
+    <repository>
+      <id>bintray-opensmarthouse-maven</id>
+      <name>bintray</name>
+      <url>https://dl.bintray.com/opensmarthouse/maven</url>
+    </repository>
+  </repositories>
 
   <build>
     <pluginManagement>
