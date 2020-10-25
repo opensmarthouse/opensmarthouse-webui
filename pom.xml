@@ -6,6 +6,7 @@
     <groupId>org.opensmarthouse</groupId>
     <artifactId>parent</artifactId>
     <version>0.9.1-SNAPSHOT</version>
+    <relativePath/>
   </parent>
 
   <groupId>org.opensmarthouse.ui</groupId>
@@ -83,6 +84,25 @@
       <url>https://dl.bintray.com/opensmarthouse/maven</url>
     </repository>
   </repositories>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.opensmarthouse.core.bom</groupId>
+        <artifactId>opensmarthouse</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.opensmarthouse.core.bom</groupId>
+        <artifactId>opensmarthouse-dependencies</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <build>
     <pluginManagement>
