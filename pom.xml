@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.opensmarthouse</groupId>
     <artifactId>parent</artifactId>
-    <version>0.9.0</version>
+    <version>0.9.1-SNAPSHOT</version>
   </parent>
 
   <groupId>org.opensmarthouse.ui</groupId>
@@ -54,6 +54,7 @@
       <url>${release.repository-url}</url>
     </repository>
     <snapshotRepository>
+      <uniqueVersion>false</uniqueVersion>
       <id>${snapshot.repository-id}</id>
       <name>${snapshot.repository-name}</name>
       <url>${snapshot.repository-url}</url>
@@ -61,20 +62,21 @@
   </distributionManagement>
 
   <properties>
-    <snapshot.repository-id>bintray-snapshots</snapshot.repository-id>
-    <snapshot.repository-name>Bintray Snapshots</snapshot.repository-name>
-    <snapshot.repository-url>https://oss.jfrog.org/artifactory/oss-snapshot-local/</snapshot.repository-url>
+    <snapshot.repository-id>opensmarthouse-snapshots</snapshot.repository-id>
+    <snapshot.repository-name>OpenSmartHouse Snapshots (GitHub)</snapshot.repository-name>
+    <snapshot.repository-url>https://maven.pkg.github.com/opensmarthouse/opensmarthouse-webui/</snapshot.repository-url>
 
     <release.repository-id>bintray-releases</release.repository-id>
     <release.repository-name>Bintray Releases</release.repository-name>
     <release.repository-url>https://api.bintray.com/maven/opensmarthouse/maven/opensmarthouse-webui/;publish=1</release.repository-url>
-
-    <sat.version>0.10.0</sat.version>
-    <spotless.version>2.0.3</spotless.version>
-    <spotless.check.skip>true</spotless.check.skip>
   </properties>
 
   <repositories>
+    <repository>
+      <id>github-opensmarthouse-maven</id>
+      <name>OpenSmartHouse Maven Repository on GitHub</name>
+      <url>https://maven.pkg.github.com/opensmarthouse</url>
+    </repository>
     <repository>
       <id>bintray-opensmarthouse-maven</id>
       <name>bintray</name>
@@ -422,28 +424,6 @@ Import-Package: \\
         </plugin>
 
         <plugin>
-          <groupId>org.openhab.tools.sat</groupId>
-          <artifactId>sat-plugin</artifactId>
-          <version>${sat.version}</version>
-          <configuration>
-            <checkstyleProperties>${basedirRoot}/tools/static-code-analysis/checkstyle/ruleset.properties</checkstyleProperties>
-            <checkstyleFilter>${basedirRoot}/tools/static-code-analysis/checkstyle/suppressions.xml</checkstyleFilter>
-          </configuration>
-          <executions>
-            <execution>
-              <id>sat-all</id>
-              <goals>
-                <goal>checkstyle</goal>
-                <goal>pmd</goal>
-                <goal>spotbugs</goal>
-                <goal>report</goal>
-              </goals>
-              <phase>verify</phase>
-            </execution>
-          </executions>
-        </plugin>
-
-        <plugin>
           <groupId>com.github.ekryd.sortpom</groupId>
           <artifactId>sortpom-maven-plugin</artifactId>
           <version>${sortpom-maven-plugin.version}</version>
@@ -462,77 +442,6 @@ Import-Package: \\
               <configuration>
                 <verifyFail>Stop</verifyFail>
               </configuration>
-            </execution>
-          </executions>
-        </plugin>
-
-        <plugin>
-          <groupId>com.diffplug.spotless</groupId>
-          <artifactId>spotless-maven-plugin</artifactId>
-          <version>${spotless.version}</version>
-          <configuration>
-            <java>
-              <eclipse>
-                <file>openhab_codestyle.xml</file>
-                <version>4.13.0</version>
-              </eclipse>
-              <removeUnusedImports />
-              <importOrder>
-                <file>openhab.importorder</file>
-              </importOrder>
-              <endWithNewline />
-            </java>
-            <formats>
-              <format>
-                <!-- *.xml -->
-                <includes>
-                  <include>src/**/*.xml</include>
-                </includes>
-                <excludes>
-                  <exclude>**/pom.xml</exclude>
-                  <exclude>src/test/resources/**/*.xml</exclude>
-                </excludes>
-                <eclipseWtp>
-                  <type>XML</type>
-                  <files>
-                    <file>openhab_wst_xml_files.prefs</file>
-                  </files>
-                  <version>4.13.0</version>
-                </eclipseWtp>
-                <trimTrailingWhitespace />
-                <endWithNewline />
-              </format>
-              <format>
-                <!-- pom.xml -->
-                <includes>
-                  <include>pom.xml</include>
-                </includes>
-                <eclipseWtp>
-                  <type>XML</type>
-                  <files>
-                    <file>openhab_wst_pom_file.prefs</file>
-                  </files>
-                  <version>4.13.0</version>
-                </eclipseWtp>
-                <trimTrailingWhitespace />
-                <endWithNewline />
-              </format>
-            </formats>
-          </configuration>
-          <dependencies>
-            <dependency>
-              <groupId>org.openhab.tools</groupId>
-              <artifactId>openhab-codestyle</artifactId>
-              <version>${sat.version}</version>
-            </dependency>
-          </dependencies>
-          <executions>
-            <execution>
-              <id>codestyle_check</id>
-              <goals>
-                <goal>check</goal>
-              </goals>
-              <phase>initialize</phase>
             </execution>
           </executions>
         </plugin>
@@ -588,62 +497,7 @@ Import-Package: \\
         <artifactId>sortpom-maven-plugin</artifactId>
       </plugin>
 
-      <plugin>
-        <groupId>com.diffplug.spotless</groupId>
-        <artifactId>spotless-maven-plugin</artifactId>
-      </plugin>
     </plugins>
-    <extensions>
-      <extension>
-        <groupId>org.openhab.tools.sat</groupId>
-        <artifactId>sat-extension</artifactId>
-        <version>${sat.version}</version>
-      </extension>
-    </extensions>
   </build>
-
-  <profiles>
-    <profile>
-      <id>skip-check</id>
-      <activation>
-        <property>
-          <name>skipChecks</name>
-        </property>
-      </activation>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.openhab.tools.sat</groupId>
-              <artifactId>sat-plugin</artifactId>
-              <version>${sat.version}</version>
-              <executions>
-                <execution>
-                  <id>sat-all</id>
-                  <phase>none</phase>
-                </execution>
-              </executions>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-    <profile>
-      <id>check-bundles</id>
-      <activation>
-        <file>
-          <exists>src</exists>
-        </file>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.openhab.tools.sat</groupId>
-            <artifactId>sat-plugin</artifactId>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 
 </project>
