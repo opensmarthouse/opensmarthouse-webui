@@ -63,7 +63,7 @@
   </distributionManagement>
 
   <properties>
-    <snapshot.repository-id>opensmarthouse-snapshots</snapshot.repository-id>
+    <snapshot.repository-id>github</snapshot.repository-id>
     <snapshot.repository-name>OpenSmartHouse Snapshots (GitHub)</snapshot.repository-name>
     <snapshot.repository-url>https://maven.pkg.github.com/opensmarthouse/opensmarthouse-webui/</snapshot.repository-url>
 
