@@ -93,7 +93,7 @@
 
   <repositories>
     <repository>
-      <id>github-opensmarthouse-maven</id>
+      <id>github</id>
       <name>OpenSmartHouse Maven Repository on GitHub</name>
       <url>https://maven.pkg.github.com/opensmarthouse</url>
     </repository>
