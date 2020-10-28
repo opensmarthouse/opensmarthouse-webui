@@ -16,6 +16,6 @@ jobs:
       with:
         java-version: 11.0.6
 
-    - run: mvn clean install
+    - run: mvn clean install --no-transfer-progress
       env:
         GITHUB_TOKEN: ${{ github.token }}
