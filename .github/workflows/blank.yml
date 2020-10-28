@@ -16,7 +16,6 @@ jobs:
       with:
         java-version: 11.0.6
 
-    - name: Build with Maven
-      run: mvn package
+    - run: mvn clean install
       env:
         GITHUB_TOKEN: ${{ github.token }}
