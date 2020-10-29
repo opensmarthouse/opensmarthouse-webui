@@ -19,15 +19,17 @@
     <module>org.opensmarthouse.ui</module>
   </modules>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.opensmarthouse.core.bom</groupId>
-      <artifactId>org.opensmarthouse.core.bom.compile-model</artifactId>
-      <version>0.9.0</version>
-      <type>pom</type>
-      <scope>provided</scope>
-    </dependency>
-  </dependencies>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.opensmarthouse.core.bom</groupId>
+        <artifactId>opensmarthouse</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <build>
     <pluginManagement>
