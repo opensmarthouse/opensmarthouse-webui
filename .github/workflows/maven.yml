@@ -19,3 +19,8 @@ jobs:
     - run: mvn clean install --no-transfer-progress
       env:
         GITHUB_TOKEN: ${{ secrets.READ_PACKAGES_TOKEN }}
+
+    - name: Deploy to GitHub Packages
+      run: mvn deploy -DaltDeploymentRepository=github::default::https://maven.pkg.github.com/${{ github.repository }} --no-transfer-progress
+      env:
+        GITHUB_TOKEN: ${{ github.token }} # GITHUB_TOKEN is the default env for the password
