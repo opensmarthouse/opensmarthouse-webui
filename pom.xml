@@ -10,7 +10,7 @@
   </parent>
 
   <groupId>org.opensmarthouse.ui</groupId>
-  <artifactId>org.opensmarthouse.ui.reactor</artifactId>
+  <artifactId>org-opensmarthouse-ui-reactor</artifactId>
 
   <packaging>pom</packaging>
 
