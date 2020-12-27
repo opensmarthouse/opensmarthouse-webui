@@ -82,6 +82,7 @@
         <f7-toolbar tabbar bottom>
           <f7-link class="padding-left padding-right" :tab-link-active="detailsTab === 'state'" @click="detailsTab = 'state'">State</f7-link>
           <f7-link class="padding-left padding-right" :tab-link-active="detailsTab === 'item'" @click="detailsTab = 'item'">Item</f7-link>
+          <f7-link class="padding-left padding-right" :tab-link-active="detailsTab === 'meta'" @click="detailsTab = 'meta'">Meta</f7-link>
           <f7-link class="padding-left padding-right" :tab-link-active="detailsTab === 'links'" @click="detailsTab = 'links'">Links</f7-link>
           <div class="right">
             <f7-link sheet-close class="padding-right"><f7-icon f7="chevron_down"></f7-icon></f7-link>
@@ -90,6 +91,7 @@
         <f7-block style="margin-bottom: 6rem" v-if="selectedItem">
           <item-state-preview v-if="detailsTab === 'state' && !newItem" :item="selectedItem.item" :context="context" />
           <item-details v-if="detailsTab === 'item'" :model="selectedItem" :links="links" @item-updated="update" @item-created="update" @item-removed="selectItem(null)" @cancel-create="selectItem(null)"/>
+          <metadata-menu v-if="detailsTab === 'meta'" :item="selectedItem.item" />
           <link-details v-if="detailsTab === 'links'" :item="selectedItem.item" :links="links" />
         </f7-block>
         <f7-block v-else>
@@ -123,7 +125,7 @@
     --f7-theme-color-rgb var(--f7-color-blue-rgb)
   z-index 10900
 .md .model-details-sheet .toolbar .link
-  width 28%
+  width 17%
 
 @media (min-width: 768px)
   .semantic-tree-wrapper
@@ -162,15 +164,23 @@ import AddFromThing from './add-from-thing.vue'
 
 import ItemStatePreview from '@/components/item/item-state-preview.vue'
 import ItemDetails from '@/components/model/item-details.vue'
+import MetadataMenu from '@/components/item/metadata/item-metadata-menu.vue'
 import LinkDetails from '@/components/model/link-details.vue'
 
 import MetadataNamespaces from '@/assets/definitions/metadata/namespaces.js'
+
+import { compareItems } from '@/components/widgets/widget-order'
+
+function compareModelItems (o1, o2) {
+  return compareItems(o1.item || o1, o2.item || o2)
+}
 
 export default {
   components: {
     ModelDetailsPane,
     ItemStatePreview,
     ItemDetails,
+    MetadataMenu,
     LinkDetails
   },
   data () {
@@ -270,24 +280,24 @@ export default {
 
         this.rootLocations = this.locations
           .filter((i) => !i.metadata.semantics.config || !i.metadata.semantics.config.isPartOf)
-          .map(this.modelItem)
+          .map(this.modelItem).sort(compareModelItems)
         this.rootLocations.forEach(this.getChildren)
         this.rootEquipments = this.equipments
           .filter((i) => !i.metadata.semantics.config || (!i.metadata.semantics.config.isPartOf && !i.metadata.semantics.config.hasLocation))
-          .map(this.modelItem)
+          .map(this.modelItem).sort(compareModelItems)
         this.rootEquipments.forEach(this.getChildren)
         this.rootPoints = this.points
           .filter((i) => !i.metadata.semantics.config || (!i.metadata.semantics.config.isPointOf && !i.metadata.semantics.config.hasLocation))
-          .map(this.modelItem)
+          .map(this.modelItem).sort(compareModelItems)
 
         if (this.includeNonSemantic) {
           this.rootGroups = this.items
             .filter((i) => i.type === 'Group' && (!i.metadata || !i.metadata.semantics) && i.groupNames.length === 0)
-            .map(this.modelItem)
+            .map(this.modelItem).sort(compareModelItems)
           this.rootGroups.forEach(this.getChildren)
           this.rootItems = this.items
             .filter((i) => i.type !== 'Group' && (!i.metadata || !i.metadata.semantics) && i.groupNames.length === 0)
-            .map(this.modelItem)
+            .map(this.modelItem).sort(compareModelItems)
         }
 
         this.loading = false
@@ -336,40 +346,40 @@ export default {
       if (parent.class.indexOf('Location') === 0) {
         parent.children.locations = this.locations
           .filter((i) => i.metadata.semantics.config && i.metadata.semantics.config.isPartOf === parent.item.name)
-          .map(this.modelItem)
+          .map(this.modelItem).sort(compareModelItems)
         parent.children.locations.forEach(this.getChildren)
         parent.children.equipments = this.equipments
           .filter((i) => i.metadata.semantics.config && i.metadata.semantics.config.hasLocation === parent.item.name)
-          .map(this.modelItem)
+          .map(this.modelItem).sort(compareModelItems)
         parent.children.equipments.forEach(this.getChildren)
 
         parent.children.points = this.points
           .filter((i) => i.metadata.semantics.config && i.metadata.semantics.config.hasLocation === parent.item.name)
-          .map(this.modelItem)
+          .map(this.modelItem).sort(compareModelItems)
       } else {
         parent.children.equipments = this.equipments
           .filter((i) => i.metadata.semantics.config && i.metadata.semantics.config.isPartOf === parent.item.name)
-          .map(this.modelItem)
+          .map(this.modelItem).sort(compareModelItems)
         parent.children.equipments.forEach(this.getChildren)
 
         parent.children.points = this.points
           .filter((i) => i.metadata.semantics.config && i.metadata.semantics.config.isPointOf === parent.item.name)
-          .map(this.modelItem)
+          .map(this.modelItem).sort(compareModelItems)
       }
 
       if (this.includeNonSemantic) {
         parent.children.groups = this.items
           .filter((i) => i.type === 'Group' && (!i.metadata) && i.groupNames.indexOf(parent.item.name) >= 0)
-          .map(this.modelItem)
+          .map(this.modelItem).sort(compareModelItems)
         parent.children.groups.forEach(this.getChildren)
         if (parent.item.metadata) {
           parent.children.items = this.items
             .filter((i) => i.type !== 'Group' && (!i.metadata) && i.groupNames.indexOf(parent.item.name) >= 0)
-            .map(this.modelItem)
+            .map(this.modelItem).sort(compareModelItems)
         } else {
           parent.children.items = this.items
             .filter((i) => i.type !== 'Group' && i.groupNames.indexOf(parent.item.name) >= 0)
-            .map(this.modelItem)
+            .map(this.modelItem).sort(compareModelItems)
         }
       }
     },

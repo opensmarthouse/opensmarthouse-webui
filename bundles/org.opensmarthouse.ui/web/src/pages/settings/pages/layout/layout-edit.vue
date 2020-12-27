@@ -60,12 +60,11 @@
   white-space pre-wrap
 .layout-editor-design-tab
   .layout-page
+    margin-bottom calc(var(--f7-toolbar-height) + 1rem)
     .oh-masonry
       z-index inherit
-      padding-bottom 5rem
 .layout-editor
   .page-content
-    padding-bottom 5rem
     z-index inherit
 </style>
 
@@ -87,6 +86,8 @@ import ModelPickerPopup from '@/components/model/model-picker-popup.vue'
 import itemDefaultStandaloneComponent from '@/components/widgets/standard/default-standalone-item'
 import itemDefaultListComponent from '@/components/widgets/standard/list/default-list-item'
 import itemDefaultCellComponent from '@/components/widgets/standard/cell/default-cell-item'
+
+import { compareItems } from '@/components/widgets/widget-order'
 
 export default {
   mixins: [PageDesigner],
@@ -196,7 +197,7 @@ export default {
       const component = this.addFromModelContext.component
       const slot = this.addFromModelContext.slot
       if (Array.isArray(value)) {
-        value.forEach((i) => {
+        value.sort(compareItems).forEach((i) => {
           component.slots[slot].push(defaultWidgetFn(i))
         })
       } else {

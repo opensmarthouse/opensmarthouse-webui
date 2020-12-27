@@ -32,6 +32,20 @@
           </f7-block>
         </f7-col>
       </f7-row>
+      <f7-row v-if="item && item.metadata && item.metadata.semantics">
+        <f7-col>
+          <f7-block-title>Semantic Classification</f7-block-title>
+          <f7-list>
+            <f7-list-item title="class" :after="item.metadata.semantics.value"></f7-list-item>
+            <f7-list-item
+              v-for="(value, key) in item.metadata.semantics.config"
+              :key="key"
+              :title="key"
+              :after="value"
+            ></f7-list-item>
+          </f7-list>
+        </f7-col>
+      </f7-row>
       <f7-row  v-if="item && item.groupNames && item.groupNames.length > 0">
         <f7-col>
           <f7-block-title>Direct Parent Groups</f7-block-title>
@@ -53,20 +67,6 @@
           <group-members :group-item="item" :context="context" @updated="load" />
         </f7-col>
       </f7-row>
-      <f7-row v-if="item && item.metadata && item.metadata.semantics">
-        <f7-col>
-          <f7-block-title>Semantic Classification</f7-block-title>
-          <f7-list>
-            <f7-list-item title="class" :after="item.metadata.semantics.value"></f7-list-item>
-            <f7-list-item
-              v-for="(value, key) in item.metadata.semantics.config"
-              :key="key"
-              :title="key"
-              :after="value"
-            ></f7-list-item>
-          </f7-list>
-        </f7-col>
-      </f7-row>
       <f7-row v-if="item.name">
         <f7-col>
           <f7-block-title>Metadata</f7-block-title>
@@ -77,6 +77,13 @@
         <f7-col>
           <f7-block-title>Channel Links</f7-block-title>
           <link-details :item="item" :links="links" />
+        </f7-col>
+      </f7-row>
+      <f7-row v-if="item.editable">
+        <f7-col>
+          <f7-list>
+            <f7-list-button color="red" @click="deleteItem">Remove Item</f7-list-button>
+          </f7-list>
         </f7-col>
       </f7-row>
     </f7-block>
@@ -165,8 +172,7 @@ export default {
       this.load()
     },
     onPageAfterIn () {
-      this.$oh.api.get('/rest/links?itemName=' + this.item.name).then((data) => {
-        console.dir(data.filter((l) => l.itemName === this.item.name))
+      this.$oh.api.get('/rest/links?itemName=' + this.itemName).then((data) => {
         this.links = data
       })
     },
@@ -178,6 +184,17 @@ export default {
         this.item = data
         this.iconUrl = (localStorage.getItem('openhab.ui:serverUrl') || '') + '/icon/' + this.item.category + '?format=svg'
       })
+    },
+    deleteItem () {
+      this.$f7.dialog.confirm(
+        `Are you sure you want to delete ${this.item.label || this.item.name}?`,
+        'Delete Item',
+        () => {
+          this.$oh.api.delete('/rest/items/' + this.item.name).then(() => {
+            this.$f7router.back('/settings/items/', { force: true })
+          })
+        }
+      )
     }
   }
 }

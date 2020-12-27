@@ -65,6 +65,7 @@
             <f7-list inline-labels no-hairlines-md>
               <f7-list-input label="Unique ID" type="text" placeholder="Required" :value="rule.uid" required validate
                             :disabled="!createMode" :info="(createMode) ? 'Note: cannot be changed after the creation' : ''"
+                            pattern="[A-Za-z0-9_\-]+" error-message="Required. A-Z,a-z,0-9,_,- only"
                             @input="rule.uid = $event.target.value" :clear-button="createMode">
               </f7-list-input>
               <f7-list-input label="Name" type="text" placeholder="Required" :value="rule.name" required validate
@@ -92,7 +93,7 @@
                   v-for="mod in rule[section]" :key="mod.id"
                   :link="isEditable && !showModuleControls" @click.native="(ev) => editModule(ev, section, mod)" swipeout>
                 <f7-link slot="media" v-if="isEditable" icon-color="red" icon-aurora="f7:minus_circle_filled" icon-ios="f7:minus_circle_filled" icon-md="material:remove_circle_outline" @click="showSwipeout"></f7-link>
-                <f7-link slot="after" v-if="!createMode && mod.type && mod.type.indexOf('script') === 0" icon-f7="pencil_ellipsis_rectangle" color="gray" @click.native="(ev) => editScriptDirect(ev, mod)" tooltip="Edit script"></f7-link>
+                <f7-link slot="after" v-if="!createMode && mod.type && mod.type.indexOf('script') === 0" icon-f7="pencil_ellipsis_rectangle" color="gray" @click.native="(ev) => editScriptDirect(ev, mod)" :tooltip="(isEditable) ? 'Edit script' : 'View script'"></f7-link>
                 <f7-link slot="after" v-if="!createMode && mod.type === 'timer.GenericCronTrigger' && isEditable" icon-f7="calendar" color="gray" @click.native="(ev) => buildCronExpression(ev, mod)" tooltip="Build cron expression"></f7-link>
                 <f7-swipeout-actions right v-if="isEditable">
                   <f7-swipeout-button @click="(ev) => deleteModule(ev, section, mod)" style="background-color: var(--f7-swipeout-delete-button-bg-color)">Delete</f7-swipeout-button>
@@ -111,6 +112,12 @@
             <semantics-picker v-if="isEditable" :item="rule"></semantics-picker>
             <tag-input :item="rule" :disabled="!isEditable"></tag-input>
           </f7-col>
+          <f7-col v-if="isEditable && !createMode">
+            <f7-list>
+              <f7-list-button color="red" @click="deleteRule">Remove Rule</f7-list-button>
+            </f7-list>
+          </f7-col>
+
         </f7-block>
       </f7-tab>
       <f7-tab id="code" @tab:show="() => { this.currentTab = 'code'; toYaml() }" :tab-active="currentTab === 'code'">
@@ -333,6 +340,17 @@ export default {
         }).open()
       })
     },
+    deleteRule () {
+      this.$f7.dialog.confirm(
+        `Are you sure you want to delete ${this.rule.name}?`,
+        'Delete Rule',
+        () => {
+          this.$oh.api.delete('/rest/rules/' + this.rule.uid).then(() => {
+            this.$f7router.back('/settings/rules/', { force: true })
+          })
+        }
+      )
+    },
     startEventSource () {
       this.eventSource = this.$oh.sse.connect('/rest/events?topics=openhab/rules/' + this.ruleId + '/*', null, (event) => {
         console.log(event)
@@ -501,7 +519,8 @@ export default {
       this.currentModuleType = mod.type
       this.scriptCode = mod.configuration.script
 
-      this.save().then(() => {
+      const updatePromise = (this.rule.editable) ? this.save() : Promise.resolve()
+      updatePromise.then(() => {
         this.$f7router.navigate('script/' + mod.id, { transition: this.$theme.aurora ? 'f7-cover-v' : '' })
       })
     },
