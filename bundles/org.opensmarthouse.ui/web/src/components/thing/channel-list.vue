@@ -93,6 +93,8 @@ import ChannelGroup from './channel-group.vue'
 import ChannelLink from './channel-link.vue'
 import ItemForm from '@/components/item/item-form.vue'
 
+import { Points } from '@/assets/semantics'
+
 export default {
   props: ['thingType', 'thing', 'channelTypes', 'pickerMode', 'multipleLinksMode', 'itemTypeFilter', 'newItemsPrefix', 'newItems', 'context'],
   components: {
@@ -176,7 +178,6 @@ export default {
       return channel.linkedItems && channel.linkedItems.length > 0
     },
     toggleItemCheck (channel, channelType) {
-      console.log('toggle check')
       if (this.isChecked(channel)) {
         this.selectedChannels.splice(this.selectedChannels.indexOf(channel), 1)
         this.newItems.splice(this.newItems.findIndex((i) => i.channel === channel), 1)
@@ -184,7 +185,12 @@ export default {
         this.selectedChannels.push(channel)
         let newItemName = (this.newItemsPrefix) ? this.newItemsPrefix : diacritic.clean(this.thing.label).replace(/[^0-9a-z]/gi, '')
         newItemName += '_'
-        newItemName += (channel.label) ? diacritic.clean(channel.label).replace(/[^0-9a-z]/gi, '') : diacritic.clean(channelType.label).replace(/[^0-9a-z]/gi, '')
+        let suffix = channel.label || channelType.label || channel.id
+        if (this.thing.channels.filter((c) => c.label === suffix || (c.channelTypeUID && this.channelTypesMap[c.channelTypeUID] && this.channelTypesMap[c.channelTypeUID].label === suffix)).length > 1) {
+          suffix = channel.id.replace('#', '_').replace(/(^\w{1})|(_+\w{1})/g, letter => letter.toUpperCase())
+        }
+        newItemName += diacritic.clean(suffix).replace(/[^0-9a-z_]/gi, '')
+        const defaultTags = (channel.defaultTags.length > 0) ? channel.defaultTags : channelType.tags
         const newItem = {
           channel: channel,
           channelType: channelType,
@@ -192,7 +198,7 @@ export default {
           label: channel.label || channelType.label,
           category: (channelType) ? channelType.category : '',
           type: channel.itemType,
-          tags: ['Point']
+          tags: (defaultTags.find((t) => Points.indexOf(t) >= 0)) ? defaultTags : [...defaultTags, 'Point']
         }
         this.newItems.push(newItem)
       }
@@ -213,7 +219,6 @@ export default {
       return this.newItems.find((i) => i.channel === channel)
     },
     channelOpened (payload) {
-      console.log('caught channel-opened')
       this.openedChannelId = payload.channelId
       this.openedChannel = payload.channel
     }

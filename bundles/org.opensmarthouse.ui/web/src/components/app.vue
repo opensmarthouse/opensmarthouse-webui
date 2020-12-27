@@ -12,7 +12,7 @@
       </f7-link>
       <f7-list v-if="ready">
         <f7-list-item v-if="$store.getters.apiEndpoint('ui') && (!pages || !pages.length)">
-          <span><em>No pages</em></span>
+          <span><em>{{$t('sidebar.noPages')}}</em></span>
         </f7-list-item>
         <!-- <f7-list-item v-for="sitemap in sitemaps" :animate="false" :key="sitemap.name"
                 :class="{ currentsection: currentUrl.indexOf('/sitemap/' + sitemap.name) >= 0 }"
@@ -27,9 +27,9 @@
           <f7-icon slot="media" :f7="pageIcon(page)"></f7-icon>
         </f7-list-item>
       </f7-list>
-      <f7-block-title v-if="$store.getters.isAdmin">Administration</f7-block-title>
+      <f7-block-title v-if="$store.getters.isAdmin" v-t="'sidebar.administration'"></f7-block-title>
       <f7-list class="admin-links" v-if="$store.getters.isAdmin">
-        <f7-list-item link="/settings/" title="Settings" view=".view-main" panel-close :animate="false"
+        <f7-list-item link="/settings/" :title="$t('sidebar.settings')" view=".view-main" panel-close :animate="false"
             :class="{ currentsection: currentUrl === '/settings/' || currentUrl.indexOf('/settings/addons/') >= 0 || currentUrl.indexOf('/settings/services/') >= 0 }">
           <f7-icon slot="media" ios="f7:gear_alt_fill" aurora="f7:gear_alt_fill" md="material:settings" color="gray"></f7-icon>
         </f7-list-item>
@@ -66,7 +66,7 @@
           </ul>
         </li>
 
-        <f7-list-item link="/developer/" title="Developer Tools" panel-close
+        <f7-list-item link="/developer/" :title="$t('sidebar.developerTools')" panel-close
             :class="{ currentsection: currentUrl.indexOf('/developer/') >= 0 && currentUrl.indexOf('/developer/widgets') < 0 && currentUrl.indexOf('/developer/api-explorer') < 0 }">
           <f7-icon slot="media" ios="f7:exclamationmark_shield_fill" aurora="f7:exclamationmark_shield_fill" md="material:extension" color="gray"></f7-icon>
         </f7-list-item>
@@ -85,7 +85,7 @@
       </f7-list>
 
       <f7-list class="admin-links">
-        <f7-list-item link="/about/" title="Help &amp; About" view=".view-main" panel-close
+        <f7-list-item link="/about/" :title="$t('sidebar.helpAbout')" view=".view-main" panel-close
             :class="{ currentsection: currentUrl.indexOf('/about') >= 0 }">
           <f7-icon slot="media" ios="f7:question_circle_fill" aurora="f7:question_circle_fill" md="material:help" color="gray"></f7-icon>
         </f7-list-item>
@@ -94,9 +94,9 @@
       <div slot="fixed" class="account" v-if="ready">
         <div class="display-flex justify-content-center">
           <div class="hint-signin" v-if="!$store.getters.user && !$store.getters.pages.filter((p) => p.uid !== 'overview').length">
-            <em>Sign in as an administrator to access settings<br /><f7-icon f7="arrow_down" size="20"></f7-icon></em>
+            <em>{{ $t('sidebar.tip.signIn') }}<br /><f7-icon f7="arrow_down" size="20"></f7-icon></em>
           </div>
-          <f7-button v-if="!loggedIn" large color="gray" icon-size="36" tooltip="Unlock Administration" icon-f7="lock_shield_fill" @click="authorize()" />
+          <f7-button v-if="!loggedIn" large color="gray" icon-size="36" :tooltip="$t('sidebar.unlockAdmin')" icon-f7="lock_shield_fill" @click="authorize()" />
         </div>
         <f7-list v-if="$store.getters.user" media-list>
           <f7-list-item :title="$store.getters.user.name" :footer="serverDisplayUrl" io="f7:person_alt_circle_fill" link="/profile/" no-chevron panel-close view=".view-main"
@@ -234,15 +234,24 @@ import PanelRight from '../pages/panel-right.vue'
 import DeveloperSidebar from './developer/developer-sidebar.vue'
 
 import auth from './auth-mixin.js'
+import i18n from './i18n-mixin.js'
+
+import dayjs from 'dayjs'
+import dayjsLocales from 'dayjs/locale.json'
 
 export default {
-  mixins: [auth],
+  mixins: [auth, i18n],
   components: {
     PanelRight,
     DeveloperSidebar
   },
   data () {
     let theme = localStorage.getItem('openhab.ui:theme')
+
+    if ((!theme || theme === 'auto') && window.OHApp && window.OHApp.preferTheme) {
+      theme = window.OHApp.preferTheme()
+    }
+
     // choose Aurora as default theme for desktops
     if ((!theme || theme === 'auto') && this.$device.desktop) {
       theme = 'aurora'
@@ -350,13 +359,24 @@ export default {
         .then((rootResponse) => {
           // store the REST API services present on the system
           this.$store.commit('setRootResource', { rootResponse })
-          return Promise.resolve(rootResponse)
-        }).then(() => {
+          this.updateLocale()
+          return rootResponse
+        }).then((rootResponse) => {
+          let locale = this.$store.state.locale
+          let dayjsLocalePromise = Promise.resolve(null)
+          // try to resolve the dayjs file to load if it exists
+          if (locale) {
+            let dayjsLocale = dayjsLocales.find((l) => l.key === locale.replace('_', '-').toLowerCase())
+            if (!dayjsLocale) dayjsLocale = dayjsLocales.find((l) => l.key === locale.split('_')[0].toLowerCase())
+            dayjsLocalePromise = (dayjsLocale) ? import('dayjs/locale/' + dayjsLocale.key + '.js').then(() => Promise.resolve(dayjsLocale)) : Promise.resolve(null)
+          }
           // load the pages & widgets, only if the 'ui' endpoint exists (or empty arrays otherwise)
-          return Promise.all(
-            this.$store.getters.apiEndpoint('ui')
+          return Promise.all([
+            ...this.$store.getters.apiEndpoint('ui')
               ? [this.$oh.api.get('/rest/ui/components/ui:page'), this.$oh.api.get('/rest/ui/components/ui:widget')]
-              : [Promise.resolve([]), Promise.resolve([])])
+              : [Promise.resolve([]), Promise.resolve([])],
+            dayjsLocalePromise
+          ])
         }).then((data) => {
           // store the pages & widgets
           this.$store.commit('setPages', { pages: data[0] })
@@ -367,6 +387,8 @@ export default {
               const order2 = p2.config.order || 1000
               return order1 - order2
             })
+
+          if (data[2]) dayjs.locale(data[2].key)
 
           this.ready = true
           return Promise.resolve()
@@ -436,7 +458,7 @@ export default {
       })
     },
     updateThemeOptions () {
-      this.themeOptions.dark = localStorage.getItem('openhab.ui:theme.dark') || (this.$f7.darkTheme ? 'dark' : 'light')
+      this.themeOptions.dark = localStorage.getItem('openhab.ui:theme.dark') || ((window.OHApp && window.OHApp.preferDarkMode) ? window.OHApp.preferDarkMode().toString() === 'dark' : (this.$f7.darkTheme ? 'dark' : 'light'))
       this.themeOptions.bars = localStorage.getItem('openhab.ui:theme.bars') || ((this.$theme.ios || this.$f7.darkTheme || this.themeOptions.dark === 'dark') ? 'light' : 'filled')
       this.themeOptions.homeNavbar = localStorage.getItem('openhab.ui:theme.home.navbar') || 'default'
       this.themeOptions.homeBackground = localStorage.getItem('openhab.ui:theme.home.background') || 'default'
@@ -469,7 +491,7 @@ export default {
     if (refreshToken) {
       this.refreshAccessToken().then(() => {
         this.loggedIn = true
-        this.loadData()
+        // this.loadData()
         this.init = true
       }).catch((err) => {
         console.warn('Error while using the stored refresh_token to get a new access_token: ' + err + '. Logging out & cleaning session.')
@@ -526,6 +548,10 @@ export default {
       })
 
       this.$f7.on('sidebarRefresh', () => {
+        this.loadData()
+      })
+
+      this.$f7.on('localeChange', () => {
         this.loadData()
       })
 
