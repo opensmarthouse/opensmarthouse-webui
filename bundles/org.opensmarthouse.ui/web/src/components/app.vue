@@ -90,6 +90,9 @@
           <f7-icon slot="media" ios="f7:question_circle_fill" aurora="f7:question_circle_fill" md="material:help" color="gray"></f7-icon>
         </f7-list-item>
       </f7-list>
+      <f7-link class="breakpoint-pin" @click="toggleVisibleBreakpoint">
+        <f7-icon slot="media" size="14" :f7="this.visibleBreakpointDisabled ? 'pin_slash' : 'pin'" color="gray"></f7-icon>
+      </f7-link>
 
       <div slot="fixed" class="account" v-if="ready">
         <div class="display-flex justify-content-center">
@@ -203,6 +206,15 @@
       width 100%
       margin-bottom 0
       height calc(var(--f7-tabbar-labels-height) + var(--f7-safe-area-bottom))
+  .breakpoint-pin
+    position fixed
+    top calc(var(--f7-safe-area-top))
+    right 0
+    margin 12px 10px
+    opacity 0
+  @media (min-width 960px)
+    .breakpoint-pin
+      opacity 0.75
 
 .theme-dark
   .panel-left
@@ -331,6 +343,7 @@ export default {
       sitemaps: null,
       pages: null,
       showSidebar: true,
+      visibleBreakpointDisabled: false,
       loginScreenOpened: false,
       loggedIn: false,
 
@@ -458,7 +471,7 @@ export default {
       })
     },
     updateThemeOptions () {
-      this.themeOptions.dark = localStorage.getItem('openhab.ui:theme.dark') || ((window.OHApp && window.OHApp.preferDarkMode) ? window.OHApp.preferDarkMode().toString() === 'dark' : (this.$f7.darkTheme ? 'dark' : 'light'))
+      this.themeOptions.dark = localStorage.getItem('openhab.ui:theme.dark') || ((window.OHApp && window.OHApp.preferDarkMode) ? window.OHApp.preferDarkMode().toString() : (this.$f7.darkTheme ? 'dark' : 'light'))
       this.themeOptions.bars = localStorage.getItem('openhab.ui:theme.bars') || ((this.$theme.ios || this.$f7.darkTheme || this.themeOptions.dark === 'dark') ? 'light' : 'filled')
       this.themeOptions.homeNavbar = localStorage.getItem('openhab.ui:theme.home.navbar') || 'default'
       this.themeOptions.homeBackground = localStorage.getItem('openhab.ui:theme.home.background') || 'default'
@@ -468,12 +481,21 @@ export default {
       } else {
         this.$$('html').removeClass('theme-dark')
       }
+      if (localStorage.getItem('openhab.ui:panel.visibleBreakpointDisabled') === 'true') {
+        this.visibleBreakpointDisabled = true
+        this.$nextTick(() => this.$f7.panel.get('left').disableVisibleBreakpoint())
+      }
     },
     toggleDeveloperSidebar () {
       if (!this.$store.getters.isAdmin) return
       this.showDeveloperSidebar = !this.showDeveloperSidebar
       if (this.showDeveloperSidebar) this.$store.dispatch('startTrackingStates')
       this.$store.commit('setDeveloperSidebar', this.showDeveloperSidebar)
+    },
+    toggleVisibleBreakpoint () {
+      this.$f7.panel.get('left').toggleVisibleBreakpoint()
+      this.visibleBreakpointDisabled = this.$f7.panel.get('left').visibleBreakpointDisabled
+      localStorage.setItem('openhab.ui:panel.visibleBreakpointDisabled', this.visibleBreakpointDisabled)
     },
     keyDown (ev) {
       if (ev.keyCode === 68 && ev.shiftKey && ev.altKey) {
@@ -486,6 +508,12 @@ export default {
   created () {
     // special treatment for this option because it's needed to configure the app initialization
     this.themeOptions.pageTransitionAnimation = localStorage.getItem('openhab.ui:theme.pagetransition') || 'default'
+    // tell the app to go fullscreen (if the OHApp is supported)
+    if (window.OHApp && typeof window.OHApp.goFullscreen === 'function') {
+      try {
+        window.OHApp.goFullscreen()
+      } catch {}
+    }
     // this.loginScreenOpened = true
     const refreshToken = this.getRefreshToken()
     if (refreshToken) {

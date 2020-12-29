@@ -163,7 +163,7 @@ export const actionsMixin = {
           const self = this
           let photos = actionConfig[prefix + 'actionPhotos']
           let photoBrowserConfig = actionConfig[prefix + 'actionPhotoBrowserConfig']
-          if (typeof photos === 'string' && photos.startsWith('{')) photos = JSON.parse(photos)
+          if (typeof photos === 'string' && photos.startsWith('[')) photos = JSON.parse(photos)
           if (typeof photoBrowserConfig === 'string' && photoBrowserConfig.startsWith('{')) photoBrowserConfig = JSON.parse(photoBrowserConfig)
           if (photos && photos.length > 0) {
             const promises = photos.map((el) => {
@@ -218,7 +218,8 @@ export const actionsMixin = {
           break
         case 'url':
           const actionUrl = actionConfig[prefix + 'actionUrl']
-          console.log('opening URL: ' + actionUrl)
+          const actionUrlSameWindow = actionConfig[prefix + 'actionUrlSameWindow']
+          window.open(actionUrl, (actionUrlSameWindow) ? '_top' : '_blank')
           break
         case 'variable':
           const actionVariable = actionConfig[prefix + 'actionVariable']

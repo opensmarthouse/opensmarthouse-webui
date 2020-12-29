@@ -6,7 +6,7 @@
         <generic-widget-component :context="childContext(slotComponent)" v-for="(slotComponent, idx) in context.component.slots.glance" :key="'glance-' + idx" @command="onCommand" />
       </div>
       <div class="location-stats margin-top" :class="config.invertText ? 'invert-text' : ''" v-if="!config.disableBadges">
-        <span v-for="badgeType in ['lights', 'windows', 'doors', 'garagedoors', 'blinds', 'presence', 'lock', 'climate', 'screens', 'projectors', 'speakers']" :key="badgeType">
+        <span v-for="badgeType in ['alarms', 'lights', 'windows', 'doors', 'garagedoors', 'blinds', 'presence', 'lock', 'climate', 'screens', 'projectors', 'speakers']" :key="badgeType">
           <status-badge v-if="!config.badges || !config.badges.length || config.badges.indexOf(badgeType) >= 0"
             :store="context.store" :element="element" :type="badgeType" :invert-color="config.invertText" />
         </span>
@@ -23,8 +23,8 @@
         <f7-button round outline :active="activeTab === 'equipment'" :color="color" @click="activeTab = 'equipment'" :text="$t('home.equipment.tab')"></f7-button>
         <f7-button round outline :active="activeTab === 'properties'" :color="color" @click="activeTab = 'properties'" :text="$t('home.properties.tab')"></f7-button>
       </f7-segmented>
-      <generic-widget-component v-if="activeTab === 'equipment'" :context="equipmentListContext" />
-      <generic-widget-component v-if="activeTab === 'properties'" :context="propertiesListContext" />
+      <generic-widget-component v-if="activeTab === 'equipment'" class="margin-vertical" :key="cardId + '-equipment'" :context="equipmentListContext" />
+      <generic-widget-component v-if="activeTab === 'properties'" class="margin-vertical" key="'cardId + '-properties'" :context="propertiesListContext" />
       <p>
         <f7-button fill round large card-close :color="color" class="margin-horizontal" :text="$t('home.cards.close')"></f7-button>
       </p>
