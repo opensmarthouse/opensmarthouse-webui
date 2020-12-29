@@ -13,7 +13,6 @@
           search-container=".rules-list"
           search-item=".rulelist-item"
           search-in=".item-title, .item-subtitle, .item-header, .item-footer"
-          remove-diacritics
           :disable-button="!$theme.aurora"
         ></f7-searchbar>
       </f7-subnavbar>
@@ -181,7 +180,6 @@ export default {
     },
     startEventSource () {
       this.eventSource = this.$oh.sse.connect('/rest/events?topics=openhab/rules/*/*', null, (event) => {
-        console.log(event)
         const topicParts = event.topic.split('/')
         switch (topicParts[3]) {
           case 'added':
@@ -191,8 +189,11 @@ export default {
             break
           case 'state':
             const rule = this.rules.find((r) => r.uid === topicParts[2])
+            const newStatus = JSON.parse(event.payload)
             if (!rule) break
-            this.$set(rule, 'status', JSON.parse(event.payload))
+            if (rule.status.status !== newStatus.status) rule.status.status = newStatus.status
+            if (rule.status.statusDetail !== newStatus.statusDetail) rule.status.statusDetail = newStatus.statusDetail
+            if (rule.status.description !== newStatus.description) rule.status.description = newStatus.description
         }
       })
     },

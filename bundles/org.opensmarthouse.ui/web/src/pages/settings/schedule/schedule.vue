@@ -13,7 +13,6 @@
           search-container=".timeline"
           search-item=".timeline-item-inner"
           search-in=".timeline-item-title"
-          remove-diacritics
           :disable-button="!$theme.aurora"
         ></f7-searchbar>
       </f7-subnavbar>
@@ -174,7 +173,6 @@ export default {
     },
     startEventSource () {
       this.eventSource = this.$oh.sse.connect('/rest/events?topics=openhab/rules/*/*', null, (event) => {
-        console.log(event)
         const topicParts = event.topic.split('/')
         switch (topicParts[3]) {
           case 'added':
@@ -196,7 +194,6 @@ export default {
       return this.selectedItems.indexOf(item) >= 0
     },
     toggleItemCheck (event, item) {
-      console.log('toggle check')
       if (this.isChecked(item)) {
         this.selectedItems.splice(this.selectedItems.indexOf(item), 1)
       } else {

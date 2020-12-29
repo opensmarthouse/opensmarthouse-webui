@@ -12,7 +12,6 @@
           :init="initSearchbar"
           search-container=".virtual-list"
           search-in=".item-title, .item-subtitle, .item-footer"
-          remove-diacritics
           :disable-button="!$theme.aurora"
         ></f7-searchbar>
       </f7-subnavbar>
@@ -165,7 +164,6 @@ export default {
     },
     startEventSource () {
       this.eventSource = this.$oh.sse.connect('/rest/events?topics=openhab/items/*/added,openhab/items/*/removed,openhab/items/*/updated', null, (event) => {
-        console.log(event)
         const topicParts = event.topic.split('/')
         switch (topicParts[3]) {
           case 'added':

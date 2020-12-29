@@ -23,7 +23,7 @@
   "setupwizard.addons.browseAddonsOnWebsite": "Informiere Dich über verfügbare Extensions auf opensmarthouse.org",
   "setupwizard.addons.selectAddons": "Wähle zu installierende Extensions",
   "setupwizard.addons.selectAddons.placeholder": "Versuche: astro, mqtt, hue, knx...",
-  "setupwizard.addons.footer": "Zur optimalen Ausnutzung der Systemressourcen installiere bitte nur die Extensions, die Du wirklich benötigst! Die Installation kann ein wenig Zeit in Anspruch nehmen. Bitte einen Moment Geduld und bleibe auf dieser Seite, bis die Anstallation abgeschlossen ist.",
+  "setupwizard.addons.footer": "Zur optimalen Ausnutzung der Systemressourcen installiere bitte nur die Extensions, die Du wirklich benötigst! Die Installation kann ein wenig Zeit in Anspruch nehmen. Bitte einen Moment Geduld und bleibe auf dieser Seite, bis die Installation abgeschlossen ist.",
   "setupwizard.addons.installAddons": "Installiere 1 extension | Installiere {n} extensions",
   "setupwizard.addons.installLater": "Später installieren",
   "setupwizard.addons.installing": "Installiere Extensions...",
