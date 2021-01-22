@@ -1,8 +1,8 @@
 <template>
 <ul>
-  <f7-list-item :title="title || 'Thing'" smart-select :smart-select-params="smartSelectParams" v-if="ready">
-    <select :name="name" :multiple="multiple" @change="select">
-      <option value=""></option>
+  <f7-list-item :title="title || 'Thing'" smart-select :smart-select-params="smartSelectParams" ref="smartSelect" v-if="ready">
+    <select :name="name" :multiple="multiple" @change="select" :required="required">
+      <option v-if="!multiple" value=""></option>
       <option v-for="thing in things" :value="thing.UID" :key="thing.UID" :selected="(multiple) ? value.indexOf(thing.UID) >= 0 : value === thing.UID">
         {{thing.label}}
       </option>
@@ -15,7 +15,7 @@
 
 <script>
 export default {
-  props: ['title', 'name', 'value', 'multiple', 'filterType', 'filterUid'],
+  props: ['title', 'name', 'value', 'multiple', 'required', 'filterType', 'filterUid', 'openOnReady'],
   data () {
     return {
       ready: false,
@@ -25,7 +25,7 @@ export default {
         view: this.$f7.view.main,
         openIn: 'popup',
         searchbar: true,
-        searchbarPlaceholder: 'Search things',
+        searchbarPlaceholder: this.$t('dialogs.search.things'),
         virtualList: true,
         virtualListHeight: (this.$theme.aurora) ? 32 : undefined
       }
@@ -51,10 +51,19 @@ export default {
         this.things = this.things.filter((t) => this.filterUid.indexOf(t.UID) >= 0)
       }
       this.ready = true
+      if (this.openOnReady) {
+        this.$nextTick(() => {
+          this.$refs.smartSelect.f7SmartSelect.open()
+        })
+      }
     })
   },
   methods: {
+    open () {
+      this.$refs.smartSelect.f7SmartSelect.open()
+    },
     select (e) {
+      this.$f7.input.validateInputs(this.$refs.smartSelect.$el)
       this.$emit('input', e.target.value)
     }
   }

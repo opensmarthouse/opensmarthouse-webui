@@ -5,7 +5,8 @@ const state = {
   itemStates: {},
   trackerConnectionId: null,
   trackerEventSource: null,
-  pendingTrackingListUpdate: false
+  pendingTrackingListUpdate: false,
+  keepConnectionOpen: false
 }
 
 let stateTrackingProxy = null
@@ -58,6 +59,7 @@ const actions = {
   },
   startTrackingStates (context) {
     console.debug('Start tracking states')
+    if (context.state.keepConnectionOpen && context.state.trackerEventSource) return
     context.commit('clearTrackingList')
     if (context.state.trackerEventSource) {
       console.debug('Closing existing state tracker connection')
@@ -81,6 +83,7 @@ const actions = {
   },
   stopTrackingStates (context) {
     console.debug('Stop tracking states')
+    if (context.state.keepConnectionOpen) return
     context.commit('clearTrackingList')
     if (context.state.trackerEventSource) {
       this._vm.$oh.sse.close(context.state.trackerEventSource)
@@ -108,8 +111,11 @@ const actions = {
       this._vm.$oh.api.postPlain('/rest/events/states/' + context.state.trackerConnectionId, trackingListJson, 'text/plain', 'application/json')
     })
   },
-  sendCommand (context, { itemName, cmd }) {
+  sendCommand (context, { itemName, cmd, updateState }) {
     console.log(`Sending command to ${itemName}: ${cmd}`)
+    if (updateState) {
+      context.commit('setItemState', { itemName, itemState: { state: cmd } })
+    }
     return this._vm.$oh.api.postPlain('/rest/items/' + itemName, cmd, 'text/plain', 'text/plain')
   }
 }
@@ -129,6 +135,9 @@ const mutations = {
   },
   clearTrackingList (state, payload) {
     Vue.set(state, 'trackingList', [])
+  },
+  keepConnectionOpen (state, value) {
+    state.keepConnectionOpen = value
   },
   setItemState (state, { itemName, itemState }) {
     Vue.set(state.itemStates, itemName.toString(), itemState)

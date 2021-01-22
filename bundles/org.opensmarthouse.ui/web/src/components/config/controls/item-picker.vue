@@ -1,21 +1,36 @@
 <template>
-<ul>
-  <f7-list-item :title="title" smart-select :smart-select-params="smartSelectParams" v-if="ready" ref="smartSelect">
-    <select :name="name" :multiple="multiple" @change="select">
+<ul class="item-picker-container">
+  <f7-list-item :title="title" smart-select :smart-select-params="smartSelectParams" v-if="ready" ref="smartSelect" class="item-picker">
+    <select :name="name" :multiple="multiple" @change="select" :required="required">
       <option value="" v-if="!multiple"></option>
       <option v-for="item in items" :value="item.name" :key="item.name" :selected="(multiple) ? Array.isArray(value) && value.indexOf(item.name) >= 0 : value === item.name">
         {{item.label ? item.label + ' (' + item.name + ')' : item.name}}
       </option>
     </select>
+    <f7-button slot="media" icon-f7="list_bullet_indent" @click.native="pickFromModel"></f7-button>
   </f7-list-item>
   <!-- for placeholder purposes before items are loaded -->
-  <f7-list-item link v-show="!ready" :title="title" />
+  <f7-list-item link v-show="!ready" :title="title">
+    <f7-button slot="media" icon-f7="list_bullet_indent" @click.native="pickFromModel"></f7-button>
+  </f7-list-item>
 </ul>
 </template>
 
+<style lang="stylus">
+.item-picker-container
+  .item-content
+    padding-left calc(var(--f7-list-item-padding-horizontal)/2 + var(--f7-safe-area-left))
+  .item-media
+    padding 0
+  .item-inner:after
+    display none
+</style>
+
 <script>
+import ModelPickerPopup from '@/components/model/model-picker-popup.vue'
+
 export default {
-  props: ['title', 'name', 'value', 'multiple', 'filterType'],
+  props: ['title', 'name', 'value', 'multiple', 'filterType', 'required', 'editableOnly'],
   data () {
     return {
       ready: false,
@@ -25,7 +40,7 @@ export default {
         view: this.$f7.view.main,
         openIn: 'popup',
         searchbar: true,
-        searchbarPlaceholder: 'Search items',
+        searchbarPlaceholder: this.$t('dialogs.search.items'),
         virtualList: true,
         virtualListHeight: (this.$theme.aurora) ? 32 : undefined
       }
@@ -43,13 +58,55 @@ export default {
       if (this.filterType) {
         this.items = this.items.filter((i) => i.type === this.filterType)
       }
+      if (this.editableOnly) {
+        this.items = this.items.filter((i) => i.editable)
+      }
       this.ready = true
     })
   },
   methods: {
     select (e) {
+      this.$f7.input.validateInputs(this.$refs.smartSelect.$el)
       const value = this.$refs.smartSelect.f7SmartSelect.getValue()
       this.$emit('input', value)
+      if (!this.multiple) this.$emit('itemSelected', this.items.find((i) => i.name === value))
+    },
+    updateFromModelPicker (value) {
+      if (this.multiple) {
+        this.$emit('input', value.map((i) => i.name))
+      } else {
+        this.$emit('input', value.name)
+        this.$emit('itemSelected', value)
+      }
+      this.ready = false
+      this.$nextTick(() => { this.ready = true })
+    },
+    pickFromModel (evt) {
+      evt.cancelBubble = true
+      const popup = {
+        component: ModelPickerPopup
+      }
+
+      this.$f7router.navigate({
+        url: 'pick-from-model',
+        route: {
+          path: 'pick-from-model',
+          popup
+        }
+      }, {
+        props: {
+          value: this.value,
+          multiple: this.multiple,
+          allowEmpty: true,
+          popupTitle: this.title,
+          groupsOnly: this.filterType && this.filterType === 'Group'
+        }
+      })
+
+      this.$f7.once('itemsPicked', this.updateFromModelPicker)
+      this.$f7.once('modelPickerClosed', () => {
+        this.$f7.off('itemsPicked', this.updateFromModelPicker)
+      })
     }
   }
 }

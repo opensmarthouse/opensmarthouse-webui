@@ -1,7 +1,7 @@
 <template>
 <div>
   <div class="hint-apps" v-if="!overviewPage && !$store.getters.user && !showHABot">
-    <p><em><f7-icon class="float-right margin-left margin-bottom" f7="arrow_turn_right_up" size="20" />Open the apps panel to launch other interfaces</em></p>
+    <p><em><f7-icon class="float-right margin-left margin-bottom" f7="arrow_turn_right_up" size="20" />{{ $t('home.tip.otherApps') }}</em></p>
   </div>
   <f7-block class="block-narrow">
     <habot v-if="showHABot" @session-started="inChatSession = true" @session-end="inChatSession = false" />
@@ -19,9 +19,9 @@
   <div class="empty-overview" v-else-if="!inChatSession">
     <empty-state-placeholder icon="house" title="overview.title" text="overview.text" />
     <f7-row class="display-flex justify-content-center">
-      <f7-button large fill color="blue" external href="https://next.opensmarthouse.org/docs/" target="_blank">Documentation</f7-button>
+      <f7-button large fill color="blue" external href="https://opensmarthouse.org/docs" target="_blank" v-t="'home.overview.button.documentation'"></f7-button>
       <span style="width: 8px"></span>
-      <f7-button large color="blue" external href="https://next.opensmarthouse.org/docs/tutorial/" target="_blank">Tutorial</f7-button>
+      <f7-button large color="blue" external href="https://opensmarthouse.org/tutorial" target="_blank" v-t="'home.overview.button.tutorial'"></f7-button>
     </f7-row>
   </div>
 </div>
@@ -52,7 +52,7 @@ import OhLayoutPage from '@/components/widgets/layout/oh-layout-page.vue'
 import Habot from '../../components/home/habot.vue'
 
 export default {
-  props: ['context', 'items'],
+  props: ['context', 'allowChat'],
   components: {
     OhLayoutPage,
     Habot
@@ -69,7 +69,7 @@ export default {
   },
   computed: {
     showHABot () {
-      return this.$store.getters.apiEndpoint('habot') && localStorage.getItem('openhab.ui:theme.home.hidechatinput') !== 'true'
+      return this.$store.getters.apiEndpoint('habot') && this.allowChat && localStorage.getItem('openhab.ui:theme.home.hidechatinput') !== 'true'
     },
     overviewPage () {
       const page = this.$store.getters.page('overview')
@@ -81,7 +81,8 @@ export default {
     overviewPageContext () {
       return {
         component: this.overviewPage,
-        store: this.context.store
+        store: this.context.store,
+        vars: {}
       }
     }
   },

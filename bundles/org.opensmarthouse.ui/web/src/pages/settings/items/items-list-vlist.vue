@@ -12,7 +12,6 @@
           :init="initSearchbar"
           search-container=".virtual-list"
           search-in=".item-title, .item-subtitle, .item-footer"
-          remove-diacritics
           :disable-button="!$theme.aurora"
         ></f7-searchbar>
       </f7-subnavbar>
@@ -24,7 +23,7 @@
         {{selectedItems.length}} selected
       </div>
       <div class="right" v-if="$theme.md">
-        <f7-link icon-md="material:delete" icon-color="white" @click="removeSelected"></f7-link>
+        <f7-link v-show="selectedItems.length" icon-md="material:delete" icon-color="white" @click="removeSelected"></f7-link>
       </div>
     </f7-toolbar>
 
@@ -60,7 +59,7 @@
           ref="itemsList"
           media-list
           virtual-list
-          :virtual-list-params="{ items, searchAll, renderExternal, height: $theme.ios ? 78 : $theme.aurora ? 60 : 87}"
+          :virtual-list-params="{ items, searchAll, renderExternal, height: vlData.height }"
         >
           <ul>
             <f7-list-item
@@ -70,8 +69,9 @@
               class="itemlist-item"
               :checkbox="showCheckboxes"
               :checked="isChecked(item.name)"
-              @change="(e) => toggleItemCheck(e, item.name)"
-              :link="showCheckboxes ? null : item.name"
+              @click.ctrl="(e) => ctrlClick(e, item)"
+              @click.exact="(e) => click(e, item)"
+              link=""
               :title="(item.label) ? item.label : item.name"
               :footer="(item.label) ? item.name : '\xa0'"
               :subtitle="getItemTypeAndMetaLabel(item)"
@@ -113,6 +113,11 @@
 <script>
 export default {
   data () {
+    let vlHeight
+    if (this.$theme.ios) vlHeight = 78
+    if (this.$theme.aurora) vlHeight = 60
+    if (this.$theme.md) vlHeight = 87
+    if (this.$device.firefox) vlHeight += 1
     return {
       ready: false,
       loading: false,
@@ -120,7 +125,8 @@ export default {
       indexedItems: {},
       initSearchbar: false,
       vlData: {
-        items: []
+        items: [],
+        height: vlHeight
       },
       selectedItems: [],
       showCheckboxes: false,
@@ -158,7 +164,6 @@ export default {
     },
     startEventSource () {
       this.eventSource = this.$oh.sse.connect('/rest/events?topics=openhab/items/*/added,openhab/items/*/removed,openhab/items/*/updated', null, (event) => {
-        console.log(event)
         const topicParts = event.topic.split('/')
         switch (topicParts[3]) {
           case 'added':
@@ -207,8 +212,19 @@ export default {
     isChecked (item) {
       return this.selectedItems.indexOf(item) >= 0
     },
+    click (event, item) {
+      if (this.showCheckboxes) {
+        this.toggleItemCheck(event, item.name, item)
+      } else {
+        this.$f7router.navigate(item.name)
+      }
+    },
+    ctrlClick (event, item) {
+      this.toggleItemCheck(event, item.name, item)
+      if (!this.selectedItems.length) this.showCheckboxes = false
+    },
     toggleItemCheck (event, item) {
-      console.log('toggle check')
+      if (!this.showCheckboxes) this.showCheckboxes = true
       if (this.isChecked(item)) {
         this.selectedItems.splice(this.selectedItems.indexOf(item), 1)
       } else {

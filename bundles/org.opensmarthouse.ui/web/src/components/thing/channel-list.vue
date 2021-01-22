@@ -3,6 +3,7 @@
     <f7-block v-show="thing.channels.length > 0">
       <f7-col>
         <f7-searchbar
+          ref="searchbar"
           :disable-button="false"
           inline
           disable-link-text="Cancel"
@@ -14,11 +15,20 @@
         ></f7-searchbar>
       </f7-col>
     </f7-block>
-    <div style="text-align:right" class="padding-right padding-bottom" v-if="hasAdvanced">
+    <div style="text-align:right" class="padding-right" v-if="hasAdvanced">
       <label @click="toggleAdvanced" class="advanced-label">Show advanced</label> <f7-checkbox name="channel-advanced" :checked="showAdvanced" @change="toggleAdvanced"></f7-checkbox>
     </div>
     <f7-col v-if="thing.channels.length > 0">
-      <f7-block width="100" class="channel-group no-margin no-padding">
+      <f7-block width="100" class="channel-group no-margin no-padding" ref="channelList">
+        <f7-row class="searchbar-ignore">
+          <f7-col class="padding-left padding-right searchbar-ignore">
+            <f7-segmented class="searchbar-ignore" strong tag="p">
+              <f7-button class="searchbar-ignore" @click="toggleLinkFilter(undefined)" small :active="showLinked === undefined" text="All"></f7-button>
+              <f7-button class="searchbar-ignore" @click="toggleLinkFilter(true)" small :active="showLinked === true" text="Linked"></f7-button>
+              <f7-button class="searchbar-ignore" @click="toggleLinkFilter(false)" small :active="showLinked === false" text="Unlinked"></f7-button>
+            </f7-segmented>
+          </f7-col>
+        </f7-row>
         <f7-row v-for="group in channelGroups" :key="group.id">
           <f7-col>
             <!-- <f7-block-title class="channel-group-title">{{group.label}}</f7-block-title>
@@ -30,6 +40,7 @@
               :group="group"
               :thing="thing"
               :picker-mode="pickerMode" :multiple-links-mode="multipleLinksMode" :item-type-filter="itemTypeFilter"
+              :selection="(multipleLinksMode) ? selectedChannels : selectedChannel"
               @selected="selectChannel"
               @channel-opened="channelOpened">
               <template v-slot:default="{ channelId, channelType, channel, extensible }" v-if="!pickerMode && !multipleLinksMode">
@@ -45,6 +56,10 @@
             </channel-group>
           </f7-col>
         </f7-row>
+        <f7-list v-if="multipleLinksMode">
+          <f7-list-button color="blue" @click="toggleAllChecks(true)">Select All</f7-list-button>
+          <f7-list-button color="blue" @click="toggleAllChecks(false)">Unselect All</f7-list-button>
+        </f7-list>
       </f7-block>
     </f7-col>
     <f7-col v-else>
@@ -72,9 +87,13 @@
 </style>
 
 <script>
+import diacritic from 'diacritic'
+
 import ChannelGroup from './channel-group.vue'
 import ChannelLink from './channel-link.vue'
 import ItemForm from '@/components/item/item-form.vue'
+
+import { Points } from '@/assets/semantics'
 
 export default {
   props: ['thingType', 'thing', 'channelTypes', 'pickerMode', 'multipleLinksMode', 'itemTypeFilter', 'newItemsPrefix', 'newItems', 'context'],
@@ -86,6 +105,7 @@ export default {
   data () {
     return {
       showAdvanced: false,
+      showLinked: undefined,
       openedChannelId: '',
       openedChannel: null,
       selectedChannel: null,
@@ -111,8 +131,10 @@ export default {
             console.warn('Channel type ' + c.channelTypeUID + ' not found for channel ' + c.id)
             return
           }
-          if (this.showAdvanced || !channelType.advanced) {
-            groups[groupIndex].channels.push({ channel: c, channelType: channelType, extensible: this.thingType.extensibleChannelTypeIds.indexOf(c.channelTypeUID.split(':')[1]) >= 0 })
+          if ((this.showAdvanced || !channelType.advanced)) {
+            if ((this.showLinked === undefined || (this.showLinked === true && this.hasLinks(c)) || (this.showLinked === false && !this.hasLinks(c)))) {
+              groups[groupIndex].channels.push({ channel: c, channelType: channelType, extensible: this.thingType.extensibleChannelTypeIds.indexOf(c.channelTypeUID.split(':')[1]) >= 0 })
+            }
           }
           if (channelType.advanced) groups[groupIndex].hasAdvanced = true
         })
@@ -130,6 +152,17 @@ export default {
     toggleAdvanced (event) {
       this.showAdvanced = !this.showAdvanced // event.target.checked
     },
+    toggleLinkFilter (val) {
+      this.showLinked = val
+      const searchbar = this.$refs.searchbar.$el.f7Searchbar
+      const filterQuery = searchbar.query
+      this.$nextTick(() => {
+        if (filterQuery) {
+          searchbar.clear()
+          searchbar.search(filterQuery)
+        }
+      })
+    },
     selectChannel (channel, channelType) {
       if (this.pickerMode) {
         this.selectedChannel = channel
@@ -141,16 +174,23 @@ export default {
     isChecked (channel) {
       return this.selectedChannels.indexOf(channel) >= 0
     },
+    hasLinks (channel) {
+      return channel.linkedItems && channel.linkedItems.length > 0
+    },
     toggleItemCheck (channel, channelType) {
-      console.log('toggle check')
       if (this.isChecked(channel)) {
         this.selectedChannels.splice(this.selectedChannels.indexOf(channel), 1)
         this.newItems.splice(this.newItems.findIndex((i) => i.channel === channel), 1)
       } else {
         this.selectedChannels.push(channel)
-        let newItemName = (this.newItemsPrefix) ? this.newItemsPrefix : this.thing.label.replace(/[^0-9a-z]/gi, '')
+        let newItemName = (this.newItemsPrefix) ? this.newItemsPrefix : diacritic.clean(this.thing.label).replace(/[^0-9a-z]/gi, '')
         newItemName += '_'
-        newItemName += (channel.label) ? channel.label.replace(/[^0-9a-z]/gi, '') : channelType.label.replace(/[^0-9a-z]/gi, '')
+        let suffix = channel.label || channelType.label || channel.id
+        if (this.thing.channels.filter((c) => c.label === suffix || (c.channelTypeUID && this.channelTypesMap[c.channelTypeUID] && this.channelTypesMap[c.channelTypeUID].label === suffix)).length > 1) {
+          suffix = channel.id.replace('#', '_').replace(/(^\w{1})|(_+\w{1})/g, letter => letter.toUpperCase())
+        }
+        newItemName += diacritic.clean(suffix).replace(/[^0-9a-z_]/gi, '')
+        const defaultTags = (channel.defaultTags.length > 0) ? channel.defaultTags : channelType.tags
         const newItem = {
           channel: channel,
           channelType: channelType,
@@ -158,16 +198,27 @@ export default {
           label: channel.label || channelType.label,
           category: (channelType) ? channelType.category : '',
           type: channel.itemType,
-          tags: ['Point']
+          tags: (defaultTags.find((t) => Points.indexOf(t) >= 0)) ? defaultTags : [...defaultTags, 'Point']
         }
         this.newItems.push(newItem)
       }
+    },
+    toggleAllChecks (checked) {
+      this.thing.channels.forEach((c) => {
+        const channelType = this.channelTypesMap.get(c.channelTypeUID)
+        if (!channelType) return
+        if (channelType.advanced && !this.showAdvanced) return
+        if (this.showLinked === true && !this.hasLinks(c)) return
+        if (this.showLinked === false && this.hasLinks(c)) return
+        if (this.isChecked(c) === checked) return
+        this.toggleItemCheck(c, channelType)
+      })
+      this.$$(this.$refs.channelList.$el).find('input[type="checkbox"]').forEach((i) => { this.$$(i).prop('checked', checked) })
     },
     newItem (channel) {
       return this.newItems.find((i) => i.channel === channel)
     },
     channelOpened (payload) {
-      console.log('caught channel-opened')
       this.openedChannelId = payload.channelId
       this.openedChannel = payload.channel
     }

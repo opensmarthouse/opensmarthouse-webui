@@ -8,12 +8,12 @@
       <f7-subnavbar :inner="false" v-show="initSearchbar">
         <f7-searchbar
           v-if="initSearchbar"
+          ref="searchbar"
           class="searchbar-pages"
           :init="initSearchbar"
           search-container=".pages-list"
           search-item=".pagelist-item"
           search-in=".item-title, .item-subtitle, .item-header, .item-footer"
-          remove-diacritics
           :disable-button="!$theme.aurora"
         ></f7-searchbar>
       </f7-subnavbar>
@@ -25,7 +25,7 @@
         {{selectedItems.length}} selected
       </div>
       <div class="right" v-if="$theme.md">
-        <f7-link icon-md="material:delete" icon-color="white" @click="removeSelected"></f7-link>
+        <f7-link v-show="selectedItems.length" icon-md="material:delete" icon-color="white" @click="removeSelected"></f7-link>
       </div>
     </f7-toolbar>
 
@@ -48,8 +48,8 @@
         <f7-block-title class="searchbar-hide-on-search"><span v-if="ready">{{pages.length}} pages</span><span v-else>Loading...</span></f7-block-title>
         <div class="padding-left padding-right" v-show="!ready || pages.length > 0">
           <f7-segmented strong tag="p">
-            <f7-button :active="groupBy === 'alphabetical'" @click="groupBy = 'alphabetical'; $nextTick(() => $refs.listIndex.update())">Alphabetical</f7-button>
-            <f7-button :active="groupBy === 'type'" @click="groupBy = 'type'">By type</f7-button>
+            <f7-button :active="groupBy === 'alphabetical'" @click="switchGroupOrder('alphabetical')">Alphabetical</f7-button>
+            <f7-button :active="groupBy === 'type'" @click="switchGroupOrder('type')">By type</f7-button>
           </f7-segmented>
         </div>
         <f7-list v-if="!ready" contacts-list class="col wide pages-list">
@@ -81,10 +81,11 @@
               media-item
               class="pagelist-item"
               :checkbox="showCheckboxes"
-              :checked="isChecked(page.uid)"
+              :checked="isChecked(((page.component === 'Sitemap') ? 'system:sitemap:' : 'ui:page:') + page.uid)"
               :disabled="showCheckboxes && page.uid === 'overview'"
-              @change="(e) => toggleItemCheck(e, page.uid, page)"
-              :link="showCheckboxes ? null : getPageType(page).type + '/' + page.uid"
+              @click.ctrl="(e) => ctrlClick(e, page)"
+              @click.exact="(e) => click(e, page)"
+              link=""
               :title="page.config.label"
               :subtitle="getPageType(page).label"
               :footer="page.uid"
@@ -108,7 +109,7 @@
     <f7-block v-if="ready && !pages.length" class="service-config block-narrow">
       <empty-state-placeholder icon="tv" title="pages.title" text="pages.text" />
     </f7-block>
-    <f7-fab v-show="ready && !showCheckboxes" position="right-bottom" slot="fixed" color="#329E28">
+    <f7-fab v-show="ready && !showCheckboxes" position="right-bottom" slot="fixed" color="primary">
       <f7-icon ios="f7:plus" md="material:add" aurora="f7:plus"></f7-icon>
       <f7-icon ios="f7:multiply" md="material:close" aurora="f7:multiply"></f7-icon>
       <f7-fab-buttons position="top">
@@ -137,6 +138,7 @@ export default {
       pageTypes: [
         { type: 'sitemap', label: 'Sitemap', componentType: 'Sitemap', icon: 'menu' },
         { type: 'layout', label: 'Layout', componentType: 'oh-layout-page', icon: 'rectangle_grid_2x2' },
+        { type: 'home', label: 'Home', componentType: 'oh-home-page', icon: 'house' },
         { type: 'tabs', label: 'Tabbed', componentType: 'oh-tabs-page', icon: 'squares_below_rectangle' },
         { type: 'map', label: 'Map', componentType: 'oh-map-page', icon: 'map' },
         { type: 'plan', label: 'Floor plan', componentType: 'oh-plan-page', icon: 'square_stack_3d_up' },
@@ -197,14 +199,37 @@ export default {
         setTimeout(() => { this.initSearchbar = true; this.$refs.listIndex.update() })
       })
     },
+    switchGroupOrder (groupBy) {
+      this.groupBy = groupBy
+      const searchbar = this.$refs.searchbar.$el.f7Searchbar
+      const filterQuery = searchbar.query
+      this.$nextTick(() => {
+        if (filterQuery) {
+          searchbar.clear()
+          searchbar.search(filterQuery)
+        }
+        if (groupBy === 'alphabetical') this.$refs.listIndex.update()
+      })
+    },
     toggleCheck () {
       this.showCheckboxes = !this.showCheckboxes
     },
     isChecked (item) {
       return this.selectedItems.indexOf(item) >= 0
     },
+    click (event, item) {
+      if (this.showCheckboxes) {
+        this.toggleItemCheck(event, item.uid, item)
+      } else {
+        this.$f7router.navigate(this.getPageType(item).type + '/' + item.uid)
+      }
+    },
+    ctrlClick (event, item) {
+      this.toggleItemCheck(event, item.uid, item)
+      if (!this.selectedItems.length) this.showCheckboxes = false
+    },
     toggleItemCheck (event, itemName, item) {
-      console.log('toggle check')
+      if (!this.showCheckboxes) this.showCheckboxes = true
       itemName = (item.component === 'Sitemap') ? 'system:sitemap:' + itemName : 'ui:page:' + itemName
       if (this.isChecked(itemName)) {
         this.selectedItems.splice(this.selectedItems.indexOf(itemName), 1)

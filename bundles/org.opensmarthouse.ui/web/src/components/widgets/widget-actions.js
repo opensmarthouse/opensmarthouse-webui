@@ -51,7 +51,7 @@ export const actionsMixin = {
           }
           let navigateOptions = { props: { deep: true } }
           if (actionPageTransition) navigateOptions.transition = actionPageTransition
-          this.$f7router.navigate('/page/' + actionPage.substring(5), navigateOptions)
+          this.$f7.views.main.router.navigate('/page/' + actionPage.substring(5), navigateOptions)
           break
         case 'command':
           const actionItem = actionConfig[prefix + 'actionItem']
@@ -157,13 +157,13 @@ export const actionsMixin = {
               modalParams: actionModalConfig || {}
             }
           }
-          this.$f7router.navigate(modalRoute, modalProps)
+          this.$f7.views.main.router.navigate(modalRoute, modalProps)
           break
         case 'photos':
           const self = this
           let photos = actionConfig[prefix + 'actionPhotos']
           let photoBrowserConfig = actionConfig[prefix + 'actionPhotoBrowserConfig']
-          if (typeof photos === 'string' && photos.startsWith('{')) photos = JSON.parse(photos)
+          if (typeof photos === 'string' && photos.startsWith('[')) photos = JSON.parse(photos)
           if (typeof photoBrowserConfig === 'string' && photoBrowserConfig.startsWith('{')) photoBrowserConfig = JSON.parse(photoBrowserConfig)
           if (photos && photos.length > 0) {
             const promises = photos.map((el) => {
@@ -206,19 +206,20 @@ export const actionsMixin = {
               }
             }
           }
-          this.$f7router.navigate(groupPopupRoute, { props: { groupItem: actionGroupItem } })
+          this.$f7.views.main.router.navigate(groupPopupRoute, { props: { groupItem: actionGroupItem } })
           break
         case 'analyze':
         case 'analyzer':
           const actionAnalyzerItems = actionConfig[prefix + 'actionAnalyzerItems']
           const actionAnalyzerChartType = actionConfig[prefix + 'actionAnalyzerChartType']
           const actionAnalyzerCoordSystem = actionConfig[prefix + 'actionAnalyzerCoordSystem']
-          this.$f7router.navigate(`/analyzer/?items=${actionAnalyzerItems.join(',')}&chartType=${actionAnalyzerChartType || ''}&coordSystem=${actionAnalyzerCoordSystem || ''}`)
+          this.$f7.views.main.router.navigate(`/analyzer/?items=${actionAnalyzerItems.join(',')}&chartType=${actionAnalyzerChartType || ''}&coordSystem=${actionAnalyzerCoordSystem || ''}`)
           console.log('Opening the analyzer')
           break
         case 'url':
           const actionUrl = actionConfig[prefix + 'actionUrl']
-          console.log('opening URL: ' + actionUrl)
+          const actionUrlSameWindow = actionConfig[prefix + 'actionUrlSameWindow']
+          window.open(actionUrl, (actionUrlSameWindow) ? '_top' : '_blank')
           break
         case 'variable':
           const actionVariable = actionConfig[prefix + 'actionVariable']

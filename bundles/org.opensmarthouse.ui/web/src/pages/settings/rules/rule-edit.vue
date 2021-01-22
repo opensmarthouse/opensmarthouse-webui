@@ -65,6 +65,7 @@
             <f7-list inline-labels no-hairlines-md>
               <f7-list-input label="Unique ID" type="text" placeholder="Required" :value="rule.uid" required validate
                             :disabled="!createMode" :info="(createMode) ? 'Note: cannot be changed after the creation' : ''"
+                            pattern="[A-Za-z0-9_\-]+" error-message="Required. A-Z,a-z,0-9,_,- only"
                             @input="rule.uid = $event.target.value" :clear-button="createMode">
               </f7-list-input>
               <f7-list-input label="Name" type="text" placeholder="Required" :value="rule.name" required validate
@@ -90,10 +91,11 @@
                   :title="mod.label || suggestedModuleTitle(mod, null, section)"
                   :footer="mod.description || suggestedModuleDescription(mod, null, section)"
                   v-for="mod in rule[section]" :key="mod.id"
-                  :link="isEditable && !showModuleControls" @click.native="(ev) => editModule(ev, section, mod)" swipeout>
+                  :link="isEditable && !showModuleControls"
+                  @click.native="(ev) => editModule(ev, section, mod)" swipeout>
                 <f7-link slot="media" v-if="isEditable" icon-color="red" icon-aurora="f7:minus_circle_filled" icon-ios="f7:minus_circle_filled" icon-md="material:remove_circle_outline" @click="showSwipeout"></f7-link>
-                <f7-link slot="after" v-if="mod.type === 'script.ScriptAction'" icon-f7="pencil_ellipsis_rectangle" color="gray" @click.native="(ev) => editScriptDirect(ev, mod)" tooltip="Edit script"></f7-link>
-                <f7-link slot="after" v-if="mod.type === 'timer.GenericCronTrigger' && isEditable" icon-f7="calendar" color="gray" @click.native="(ev) => buildCronExpression(ev, mod)" tooltip="Build cron expression"></f7-link>
+                <f7-link slot="after" v-if="mod.type && mod.type.indexOf('script') === 0" icon-f7="pencil_ellipsis_rectangle" color="gray" @click.native="(ev) => editModule(ev, section, mod, true)" :tooltip="'Edit module'"></f7-link>
+                <f7-link slot="after" v-if="mod.type === 'timer.GenericCronTrigger' && isEditable" icon-f7="pencil_ellipsis_rectangle" color="gray" @click.native="(ev) => editModule(ev, section, mod, true)" tooltip="Edit module"></f7-link>
                 <f7-swipeout-actions right v-if="isEditable">
                   <f7-swipeout-button @click="(ev) => deleteModule(ev, section, mod)" style="background-color: var(--f7-swipeout-delete-button-bg-color)">Delete</f7-swipeout-button>
                 </f7-swipeout-actions>
@@ -111,10 +113,16 @@
             <semantics-picker v-if="isEditable" :item="rule"></semantics-picker>
             <tag-input :item="rule" :disabled="!isEditable"></tag-input>
           </f7-col>
+          <f7-col v-if="isEditable && !createMode">
+            <f7-list>
+              <f7-list-button color="red" @click="deleteRule">Remove Rule</f7-list-button>
+            </f7-list>
+          </f7-col>
+
         </f7-block>
       </f7-tab>
       <f7-tab id="code" @tab:show="() => { this.currentTab = 'code'; toYaml() }" :tab-active="currentTab === 'code'">
-        <editor v-if="currentTab === 'code'" class="rule-code-editor" mode="application/vnd.openhab.rule" :value="ruleYaml" @input="(value) => ruleYaml = value" />
+        <editor v-if="currentTab === 'code'" class="rule-code-editor" mode="application/vnd.openhab.rule+yaml" :value="ruleYaml" @input="(value) => ruleYaml = value" />
         <!-- <pre class="yaml-message padding-horizontal" :class="[yamlError === 'OK' ? 'text-color-green' : 'text-color-red']">{{yamlError}}</pre> -->
       </f7-tab>
     </f7-tabs>
@@ -160,7 +168,6 @@ import SemanticsPicker from '@/components/tags/semantics-picker.vue'
 import TagInput from '@/components/tags/tag-input.vue'
 
 import RuleModulePopup from './rule-module-popup.vue'
-import ScriptEditorPopup from '@/components/config/controls/script-editor-popup.vue'
 import CronEditor from '@/components/config/controls/cronexpression-editor.vue'
 
 import ModuleDescriptionSuggestions from './module-description-suggestions'
@@ -208,7 +215,6 @@ export default {
   },
   methods: {
     onPageAfterIn () {
-      if (this.ready) return
       if (window) {
         window.addEventListener('keydown', this.keyDown)
       }
@@ -260,30 +266,24 @@ export default {
       })
     },
     save (stay) {
-      if (!this.isEditable) return
+      if (!this.isEditable) return Promise.reject()
       if (this.currentTab === 'code') {
         if (!this.fromYaml()) {
-          return
+          return Promise.reject()
         }
       }
       if (!this.rule.uid) {
         this.$f7.dialog.alert('Please give an ID to the rule')
-        return
+        return Promise.reject()
       }
       if (!this.rule.name) {
         this.$f7.dialog.alert('Please give a name to the rule')
-        return
-      }
-      if (this.codeEditorOpened) {
-        // save the code currently being edited if the dialog is open
-        // this allows to hit ctrl-S to save (and ctrl-R to run the rule) while editing the code
-        // without closing the window
-        this.currentModule.configuration.script = this.$refs.codePopup.code
+        return Promise.reject()
       }
       const promise = (this.createMode)
         ? this.$oh.api.postPlain('/rest/rules', JSON.stringify(this.rule), 'text/plain', 'application/json')
         : this.$oh.api.put('/rest/rules/' + this.rule.uid, this.rule)
-      promise.then((data) => {
+      return promise.then((data) => {
         if (this.createMode) {
           this.$f7.toast.create({
             text: 'Rule created',
@@ -341,9 +341,19 @@ export default {
         }).open()
       })
     },
+    deleteRule () {
+      this.$f7.dialog.confirm(
+        `Are you sure you want to delete ${this.rule.name}?`,
+        'Delete Rule',
+        () => {
+          this.$oh.api.delete('/rest/rules/' + this.rule.uid).then(() => {
+            this.$f7router.back('/settings/rules/', { force: true })
+          })
+        }
+      )
+    },
     startEventSource () {
       this.eventSource = this.$oh.sse.connect('/rest/events?topics=openhab/rules/' + this.ruleId + '/*', null, (event) => {
-        console.log(event)
         const topicParts = event.topic.split('/')
         switch (topicParts[3]) {
           case 'state':
@@ -391,7 +401,7 @@ export default {
         this.$f7.swipeout.open(swipeoutElement)
       }
     },
-    editModule (ev, section, mod) {
+    editModule (ev, section, mod, force) {
       if (this.showModuleControls) return
       if (!this.isEditable) return
       let swipeoutElement = ev.target
@@ -403,6 +413,15 @@ export default {
       this.currentSection = section
       this.currentModule = Object.assign({}, mod)
       this.currentModuleType = this.moduleTypes[section].find((m) => m.uid === mod.type)
+
+      if (mod.type && mod.type.indexOf('script') === 0 && !force) {
+        this.editScriptDirect(ev, mod)
+        return
+      }
+      if (mod.type && mod.type === 'timer.GenericCronTrigger' && !force) {
+        this.buildCronExpression(ev, mod)
+        return
+      }
 
       const popup = {
         component: RuleModulePopup
@@ -477,8 +496,10 @@ export default {
       })
 
       this.$f7.once('ruleModuleConfigUpdate', this.saveModule)
+      this.$f7.once('editNewScript', this.saveAndEditNewScript)
       this.$f7.once('ruleModuleConfigClosed', () => {
         this.$f7.off('ruleModuleConfigUpdate', this.saveModule)
+        this.$f7.off('editNewScript', this.saveAndEditNewScript)
         this.moduleConfigClosed()
       })
     },
@@ -499,6 +520,12 @@ export default {
         this.$set(this.rule[this.currentSection], idx, updatedModule)
       }
     },
+    saveAndEditNewScript (updatedModule) {
+      this.saveModule(updatedModule)
+      this.save().then(() => {
+        this.$f7router.navigate('/settings/rules/' + this.rule.uid + '/script/' + updatedModule.id, { transition: this.$theme.aurora ? 'f7-cover-v' : '' })
+      })
+    },
     moduleConfigClosed () {
       this.currentModule = null
       this.currentModuleType = null
@@ -509,31 +536,9 @@ export default {
       this.currentModuleType = mod.type
       this.scriptCode = mod.configuration.script
 
-      const popup = {
-        component: ScriptEditorPopup
-      }
-
-      this.$f7router.navigate({
-        url: 'script-edit',
-        route: {
-          path: 'script-edit',
-          popup
-        }
-      }, {
-        props: {
-          title: 'Edit Script',
-          fullscreen: false,
-          value: this.scriptCode
-        }
-      })
-
-      this.$f7.once('scriptEditorUpdate', this.updateScript)
-      this.$f7.once('scriptEditorClosed', () => {
-        this.$f7.off('scriptEditorUpdate', this.updateScript)
-        this.$nextTick(() => {
-          this.currentModule = null
-          this.currentModuleType = null
-        })
+      const updatePromise = (this.rule.editable || this.createMode) ? this.save() : Promise.resolve()
+      updatePromise.then(() => {
+        this.$f7router.navigate('/settings/rules/' + this.rule.uid + '/script/' + mod.id, { transition: this.$theme.aurora ? 'f7-cover-v' : '' })
       })
     },
     buildCronExpression (ev, mod) {

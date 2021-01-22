@@ -27,8 +27,13 @@ export const OhImageDefinition = () => new WidgetDefinition('oh-image', 'Image',
   .paramGroup(actionGroup(), actionParams())
   .params(ImageParameters())
 
+import VideoParameters from './video'
+export const OhVideoDefinition = () => new WidgetDefinition('oh-video', 'Video', 'Displays a video player from a URL or an item')
+    .paramGroup(actionGroup(), actionParams())
+    .params(VideoParameters())
+
 import InputParameters from './input'
-export const OhInputDefinition = () => new WidgetDefinition('oh-input', 'Input', 'Displays an input field, used to set of variable')
+export const OhInputDefinition = () => new WidgetDefinition('oh-input', 'Input', 'Displays an input field, used to set a variable')
   .params(InputParameters())
 
 import KnobParameters from './knob'
@@ -71,3 +76,7 @@ export const OhToggleDefinition = () => new WidgetDefinition('oh-toggle', 'Toggl
 import TrendParameters from './trend'
 export const OhTrendDefinition = () => new WidgetDefinition('oh-trend', 'Trend line', 'Trend line to display the overall recent evoluation of an item')
   .params(TrendParameters())
+
+import RepeaterParameters from './repeater'
+export const OhRepeaterDefinition = () => new WidgetDefinition('oh-repeater', 'Repeater', 'Iterate over an array and repeat the children components in the default slot')
+  .params(RepeaterParameters())

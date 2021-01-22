@@ -1,6 +1,6 @@
 <template>
   <f7-page class="user-profile-page" @page:beforein="onPageBeforeIn" @page:afterin="onPageAfterIn">
-    <f7-navbar title="Your Profile" back-link="Back" no-shadow no-hairline class="user-profile-navbar">
+    <f7-navbar :title="$t('profile.title')" back-link="Back" no-shadow no-hairline class="user-profile-navbar">
       <!-- <f7-nav-right>
         <f7-link icon-md="material:edit" href="edit">{{ $theme.md ? '' : 'Edit' }}</f7-link>
       </f7-nav-right> -->
@@ -19,8 +19,17 @@
     <f7-block class="block-narrow after-profile-header">
       <f7-row>
         <f7-col>
-          <f7-block-title>Sessions</f7-block-title>
-          <f7-block-footer class="padding-horizontal">Note: even if you delete a session, it might still remain active until all valid access tokens expire.</f7-block-footer>
+          <f7-list>
+            <f7-list-button color="blue" :external="true" href="changePassword">{{ $t('profile.changePassword') }}</f7-list-button>
+          </f7-list>
+        </f7-col>
+      </f7-row>
+    </f7-block>
+    <f7-block class="block-narrow">
+      <f7-row>
+        <f7-col>
+          <f7-block-title v-t="'profile.sessions'"></f7-block-title>
+          <f7-block-footer class="padding-horizontal" v-t="'profile.sessions.header'"></f7-block-footer>
           <f7-card>
             <f7-list media-list swipeout>
               <f7-list-item
@@ -28,20 +37,45 @@
                 v-for="session in sessions"
                 :key="session.sessionId"
                 :title="session.clientId"
-                :subtitle="'Created: ' + new Date(session.createdTime).toLocaleString()"
-                :text="'Last refreshed: ' + new Date(session.lastRefreshTime).toLocaleString()"
+                :subtitle="$t('profile.sessions.created') +  new Date(session.createdTime).toLocaleString($store.state.locale ? $store.state.locale.replace('_', '-') : 'default')"
+                :text="$t('profile.sessions.lastRefreshed') + new Date(session.lastRefreshTime).toLocaleString($store.state.locale ? $store.state.locale.replace('_', '-') : 'default')"
               >
                 <f7-link slot="media" icon-color="red" icon-aurora="f7:minus_circle_filled" icon-ios="f7:minus_circle_filled" icon-md="material:remove_circle_outline" @click="showSwipeout"></f7-link>
                 <f7-swipeout-actions right>
-                  <f7-swipeout-button @click="(ev) => deleteSession(ev, session)" style="background-color: var(--f7-swipeout-delete-button-bg-color)">Delete</f7-swipeout-button>
+                  <f7-swipeout-button @click="(ev) => deleteSession(ev, session)" style="background-color: var(--f7-swipeout-delete-button-bg-color)">{{ $t('dialogs.delete') }}</f7-swipeout-button>
                 </f7-swipeout-actions>
               </f7-list-item>
-              <f7-list-button color="red" @click="logout()">Sign out of this session</f7-list-button>
+              <f7-list-button color="red" @click="logout()">{{ $t('profile.sessions.signOut') }}</f7-list-button>
             </f7-list>
           </f7-card>
         </f7-col>
       </f7-row>
-
+    </f7-block>
+    <f7-block class="block-narrow margin-bottom padding-bottom">
+      <f7-row>
+        <f7-col>
+          <f7-block-title v-t="'profile.apiTokens'"></f7-block-title>
+          <f7-block-footer class="padding-horizontal" v-t="'profile.apiTokens.header'"></f7-block-footer>
+          <f7-card>
+            <f7-list media-list swipeout>
+              <f7-list-item
+                media-item swipeout
+                v-for="apiToken in apiTokens"
+                :key="apiToken.name"
+                :title="apiToken.name"
+                :subtitle="$t('profile.apiTokens.created') + new Date(apiToken.createdTime).toLocaleString($store.state.locale ? $store.state.locale.replace('_', '-') : 'default')"
+                :text="$t('profile.apiTokens.validForScope') + (apiToken.scope || 'N/A')"
+              >
+                <f7-link slot="media" icon-color="red" icon-aurora="f7:minus_circle_filled" icon-ios="f7:minus_circle_filled" icon-md="material:remove_circle_outline" @click="showSwipeout"></f7-link>
+                <f7-swipeout-actions right>
+                  <f7-swipeout-button @click="(ev) => deleteApiToken(ev, apiToken)" style="background-color: var(--f7-swipeout-delete-button-bg-color)">{{ $t('dialogs.delete') }}</f7-swipeout-button>
+                </f7-swipeout-actions>
+              </f7-list-item>
+              <f7-list-button color="blue" :external="true" href="createApiToken">{{ $t('profile.apiTokens.create') }}</f7-list-button>
+            </f7-list>
+          </f7-card>
+        </f7-col>
+      </f7-row>
     </f7-block>
   </f7-page>
 </template>
@@ -90,19 +124,28 @@
 
 <script>
 import auth from '@/components/auth-mixin.js'
+import { loadLocaleMessages } from '@/js/i18n'
 
 export default {
   mixins: [auth],
   data () {
     return {
       user: this.$store.getters.user,
-      sessions: []
+      sessions: [],
+      apiTokens: []
     }
+  },
+  i18n: {
+    messages: loadLocaleMessages(require.context('@/assets/i18n/profile'))
   },
   methods: {
     onPageBeforeIn () {
-      this.$oh.api.get('/rest/auth/sessions').then((data) => {
-        this.sessions = data
+      Promise.all([
+        this.$oh.api.get('/rest/auth/sessions'),
+        this.$oh.api.get('/rest/auth/apitokens')
+      ]).then((data) => {
+        this.sessions = data[0]
+        this.apiTokens = data[1]
       })
     },
     onPageAfterIn () {
@@ -131,12 +174,30 @@ export default {
         this.$f7.swipeout.delete(swipeoutElement, () => {
         })
         this.$f7.toast.create({
-          text: 'Session deleted',
+          text: this.$t('profile.sessions.delete.success'),
           destroyOnClose: true,
           closeTimeout: 2000
         }).open()
       }).catch((err) => {
-        this.$f7.dialog.alert('Error while deleting the session: ' + err)
+        this.$f7.dialog.alert(this.$t('profile.sessions.delete.error') + err)
+      })
+    },
+    deleteApiToken (ev, apiToken) {
+      let swipeoutElement = ev.target
+      ev.cancelBubble = true
+      while (!swipeoutElement.classList.contains('swipeout')) {
+        swipeoutElement = swipeoutElement.parentElement
+      }
+      this.$oh.api.delete('/rest/auth/apitokens/' + apiToken.name).then((data) => {
+        this.$f7.swipeout.delete(swipeoutElement, () => {
+        })
+        this.$f7.toast.create({
+          text: this.$t('profile.apiTokens.delete.success'),
+          destroyOnClose: true,
+          closeTimeout: 2000
+        }).open()
+      }).catch((err) => {
+        this.$f7.dialog.alert(this.$t('profile.apiTokens.delete.error') + err)
       })
     },
     logout () {
@@ -153,7 +214,7 @@ export default {
         }
       }).catch((err) => {
         this.$f7.preloader.hide()
-        this.$f7.dialog.alert('Error while signing out: ' + err)
+        this.$f7.dialog.alert(this.$t('profile.sessions.signOut.error') + err)
       })
     }
   }

@@ -17,7 +17,7 @@
 // import ScriptEditorPopup from './config/script-editor-popup.vue'
 import ParameterThing from './controls/parameter-thing.vue'
 import ParameterBoolean from './controls/parameter-boolean.vue'
-import ParameterInteger from './controls/parameter-integer.vue'
+import ParameterNumber from './controls/parameter-number.vue'
 import ParameterOptions from './controls/parameter-options.vue'
 import ParameterItem from './controls/parameter-item.vue'
 import ParameterScript from './controls/parameter-script.vue'
@@ -31,6 +31,7 @@ import ParameterPersistenceService from './controls/parameter-persistenceservice
 import ParameterProps from './controls/parameter-props.vue'
 import ParameterTriggerChannel from './controls/parameter-triggerchannel.vue'
 import ParameterText from './controls/parameter-text.vue'
+import ParameterQrcode from './controls/parameter-qrcode.vue'
 
 export default {
   components: {
@@ -51,8 +52,8 @@ export default {
       const configDescription = this.configDescription
       if (configDescription.options && configDescription.options.length && configDescription.limitToOptions && !configDescription.context) {
         return ParameterOptions
-      } else if (configDescription.type === 'INTEGER') {
-        return ParameterInteger
+      } else if (configDescription.type === 'INTEGER' || configDescription.type === 'DECIMAL') {
+        return ParameterNumber
       } else if (configDescription.type === 'BOOLEAN') {
         return ParameterBoolean
       } else if (configDescription.type === 'TEXT' && configDescription.context === 'script') {
@@ -81,8 +82,9 @@ export default {
         return ParameterTriggerChannel
       } else if (configDescription.type === 'TEXT' && configDescription.context === 'persistenceService') {
         return ParameterPersistenceService
+      } else if (configDescription.type === 'TEXT' && configDescription.context === 'qrcode') {
+        return ParameterQrcode
       }
-
       return ParameterText
     }
   },
@@ -116,4 +118,16 @@ export default {
       color var(--f7-block-title-text-color) !important
 .smart-select-popover.popover
   --f7-popover-width 320px
+.config-parameter
+  .smart-select
+    .input-invalid + .item-input-error-message
+      display block
+      max-width 80%
+      overflow hidden
+      text-overflow ellipsis
+      position relative
+      display block
+      white-space nowrap
+      margin-top 0
+      margin-bottom 0
 </style>

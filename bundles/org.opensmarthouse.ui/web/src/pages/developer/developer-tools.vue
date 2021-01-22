@@ -27,12 +27,19 @@
           <f7-col width="100" medium="50">
             <f7-block-title>Maintenance Tools</f7-block-title>
             <f7-list media-item>
-              <f7-list-item media-item title="API Explorer" footer="Discover and access the REST API directly" link="api-explorer">
+              <f7-list-item media-item title="Developer Sidebar" class="developer-sidebar-toggle" footer="Show a panel with various tools" link="" no-chevron @click="$f7.emit('toggleDeveloperSidebar')">
                 <f7-icon slot="media" f7="wrench" color="gray"></f7-icon>
+                <div slot="header" style="height: 100%; height: 32px" class="display-flex float-right flex-direction-column justify-content-center">
+                  <f7-toggle color="blue" :checked="$store.state.developerSidebar"></f7-toggle>
+                </div>
+              </f7-list-item>
+              <f7-list-item media-item title="API Explorer" footer="Discover and access the REST API directly" link="api-explorer">
+                <f7-icon slot="media" f7="burn" color="gray"></f7-icon>
               </f7-list-item>
             </f7-list>
           </f7-col>
         </f7-row>
+        <f7-block-footer v-if="$t('home.overview.title') !== 'Overview'" class="margin text-align-center"><small v-t="'admin.notTranslatedYet'"></small></f7-block-footer>
       </f7-block>
       </f7-tab>
       <f7-tab id="debug-tab" @tab:show="() => this.currentTab = 'debug'" :tab-active="currentTab === 'debug'">
@@ -80,6 +87,9 @@
 </template>
 
 <style lang="stylus">
+@media (max-width 1279px)
+  .developer-sidebar-toggle
+    display none
 
 </style>
 

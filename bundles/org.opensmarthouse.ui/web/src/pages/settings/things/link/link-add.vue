@@ -32,7 +32,7 @@
         <f7-list>
           <!-- TODO: filter with compatible item types -->
           <item-picker key="itemLink" title="Item to Link" name="item" :value="selectedItemName" :multiple="false"
-            @input="(value) => selectedItemName = value"></item-picker>
+            @input="(value) => selectedItemName = value" :editable-only="true"></item-picker>
         </f7-list>
       </f7-col>
 
@@ -78,7 +78,7 @@
         <f7-block-title>Profile</f7-block-title>
         <f7-block-footer class="padding-left padding-right">
           Profiles define how Channels and Items work together. Install transformation add-ons to get additional profiles.
-          <f7-link external color="blue" target="_blank" href="https://www.openhab.org/docs/configuration/items.html#profiles">Learn more about profiles.</f7-link>
+          <f7-link external color="blue" target="_blank" href="https://www.openhab.org/link/profiles">Learn more about profiles.</f7-link>
         </f7-block-footer>
         <f7-list>
           <f7-list-item radio :checked="!currentProfileType" value="" @change="onProfileTypeChange()" title="(No Profile)" name="profile-type" />
@@ -108,6 +108,8 @@
 </template>
 
 <script>
+import diacritic from 'diacritic'
+
 import ConfigSheet from '@/components/config/config-sheet.vue'
 import ItemPicker from '@/components/config/controls/item-picker.vue'
 import ThingPicker from '@/components/config/controls/thing-picker.vue'
@@ -158,9 +160,9 @@ export default {
     onPageAfterIn (event) {
       if (!this.channel) return
       this.loadProfileTypes(this.channel)
-      let newItemName = this.thing.label.replace(/[^0-9a-z]/gi, '')
+      let newItemName = diacritic.clean(this.thing.label).replace(/[^0-9a-z]/gi, '')
       newItemName += '_'
-      newItemName += (this.channel.label) ? this.channel.label.replace(/[^0-9a-z]/gi, '') : this.channelType.label.replace(/[^0-9a-z]/gi, '')
+      newItemName += (this.channel.label) ? diacritic.clean(this.channel.label).replace(/[^0-9a-z]/gi, '') : diacritic.clean(this.channelType.label).replace(/[^0-9a-z]/gi, '')
       this.$set(this, 'newItem', {
         name: newItemName,
         label: this.channel.label || this.channelType.label,
@@ -191,7 +193,7 @@ export default {
         this.profileTypeConfiguration = data
       }).catch((err) => {
         // just clear out the config sheet
-        console.log(`No configuration for profile type ${profileTypeUid}: ` + err)
+        console.warn(`No configuration for profile type ${profileTypeUid}: ` + err)
         this.profileTypeConfiguration = null
       })
     },

@@ -16,7 +16,7 @@
       />
     <div slot="label" class="semantic-class"> {{className()}}</div>
     <f7-checkbox slot="content-start" v-if="model.checkable"
-      :checked="model.checked === true" @change="check" />
+      :checked="model.checked === true" :disabled="model.disabled" @change="check" />
   </f7-treeview-item>
 </template>
 
@@ -38,7 +38,7 @@ export default {
       if (this.model.class.indexOf('Location') === 0) {
         return (theme === 'md') ? 'material:place' : 'f7:placemark'
       } else if (this.model.class.indexOf('Equipment') === 0) {
-        return (theme === 'md') ? 'material:highlight' : 'f7:lightbulb'
+        return (theme === 'md') ? 'material:payments' : 'f7:cube_box'
       } else if (this.model.class.indexOf('Point') === 0) {
         return (theme === 'md') ? 'material:flash_on' : 'f7:bolt_fill'
       } else if (this.model.item.type === 'Group') {
@@ -64,6 +64,7 @@ export default {
       if (this.model.checkable && !this.children.length) this.check({ target: { checked: !this.model.checked } })
     },
     check (event) {
+      if (this.model.disabled) return
       this.model.checked = event.target.checked
       this.$emit('checked', this.model, event.target.checked)
     }

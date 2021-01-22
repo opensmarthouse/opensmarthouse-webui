@@ -1,7 +1,7 @@
 <template>
   <f7-popup @popup:open="onOpen" @popup:close="onClose">
     <f7-page class="analyzer-content">
-      <f7-navbar :title="(item) ? item.label || item.name : ''" back-link="Back">
+      <f7-navbar :title="(item) ? item.label || item.name : ''" :back-link="$t('dialogs.back')">
       </f7-navbar>
 
       <div class="group-item-control no-padding no-margin">
@@ -21,6 +21,7 @@
 <script>
 import itemDefaultStandaloneComponent from '@/components/widgets/standard/default-standalone-item'
 import itemDefaultListComponent from '@/components/widgets/standard/list/default-list-item'
+import { compareItems } from '@/components/widgets/widget-order'
 
 export default {
   props: ['groupItem'],
@@ -88,8 +89,10 @@ export default {
 
     },
     load () {
-      this.$oh.api.get(`/rest/items/${this.groupItem}?metadata=semantics,widget,listWidget`).then((data) => {
+      this.$oh.api.get(`/rest/items/${this.groupItem}?metadata=semantics,widget,listWidget,widgetOrder`).then((data) => {
         this.item = data
+        // array is sorted in-place
+        this.item.members.sort(compareItems)
       })
     }
   }

@@ -13,6 +13,7 @@ import * as PlanWidgets from '@/components/widgets/plan'
 import * as MapWidgets from '@/components/widgets/map'
 import { OhChartPageDefinition } from '@/assets/definitions/widgets/chart/page'
 import ChartWidgetsDefinitions from '@/assets/definitions/widgets/chart/index'
+import { OhLocationCardParameters, OhEquipmentCardParameters, OhPropertyCardParameters } from '@/assets/definitions/widgets/home'
 
 function getWidgetDefinitions (cm) {
   const mode = cm.state.originalMode
@@ -34,6 +35,7 @@ function getWidgetDefinitions (cm) {
         .filter((w) => w.widget && typeof w.widget === 'function')
       const f7Components = Object.values(f7vue).filter((m) => m.name && m.name.indexOf('f7-') === 0)
       return [
+        ...(componentType === 'home') ? [OhLocationCardParameters(), OhEquipmentCardParameters(), OhPropertyCardParameters()] : [],
         ...ohComponents.map((c) => c.widget()).sort((c1, c2) => c1.name.localeCompare(c2.name)),
         ...f7Components.sort((c1, c2) => c1.name.localeCompare(c2.name))
       ]
@@ -94,7 +96,8 @@ function hintExpression (cm, line) {
         { text: 'Number.', displayText: 'Number', description: 'Access to the Number object functions' },
         { text: 'theme', displayText: 'theme', description: 'The current theme: aurora, ios, or md' },
         { text: 'themeOptions', displayText: 'themeOptions', description: 'Object with current theme options' },
-        { text: 'device', displayText: 'themeOptions', description: 'Object with information about the current device & browser' }
+        { text: 'device', displayText: 'device', description: 'Object with information about the current device & browser' },
+        { text: 'dayjs', displayText: 'dayjs', description: 'Access to the Day.js object for date manipulation & formatting' }
       ]
     }
   } else if (line[cursor.ch - 1] === '.') {
@@ -125,7 +128,7 @@ function f7ComponentParameters (componentName) {
     params.push({
       name: propName,
       label: propName,
-      description: propType + '<br />' + ((instance.props[propName] !== undefined) ? `Default value: ${JSON.stringify(instance.props[propName])}` : ''),
+      description: `${propType}<br />${(instance.props[propName] !== undefined) ? `Default value: ${JSON.stringify(instance.props[propName])}` : ''}<br /><br />See ${componentName} docs`,
       type: paramType
     })
   }
@@ -142,8 +145,15 @@ function hintConfig (cm, line, parentLineNr) {
   const colonPos = line.indexOf(':')
   const afterColon = colonPos > 0 && cursor.ch > colonPos
   const widgetDefinition = getWidgetDefinitions(cm).find((d) => d.name === componentType)
-  const parameters = (componentType.indexOf('f7-') === 0) ? f7ComponentParameters(componentType)
+  let parameters = (componentType.indexOf('f7-') === 0) ? f7ComponentParameters(componentType)
     : (widgetDefinition && widgetDefinition.props) ? widgetDefinition.props.parameters : []
+  if (componentType.indexOf('oh-') === 0) {
+    // try our luck and find a matching underlying f7-vue component...
+    const f7parameters = f7ComponentParameters(componentType.replace('oh-', 'f7-').replace('-card', ''))
+    if (f7parameters.length) {
+      parameters.push(...f7parameters.filter((p) => !parameters.find((p2) => p2.name === p.name)))
+    }
+  }
   if (afterColon) {
     if (line.indexOf('=') > 0) {
       return hintExpression(cm, line)

@@ -37,8 +37,6 @@
         <oh-layout-page class="layout-page" v-if="ready && previewMode" :context="context" :key="pageKey" />
       </f7-tab>
     </f7-tabs>
-
-    <model-picker-popup :opened="modelPickerOpened" :multiple="modelPickerAllowMultiple" @closed="modelPickerOpened = false" @input="doAddFromModel" action-label="Add" />
   </f7-page>
 </template>
 
@@ -60,12 +58,11 @@
   white-space pre-wrap
 .layout-editor-design-tab
   .layout-page
+    margin-bottom calc(var(--f7-toolbar-height) + 1rem)
     .oh-masonry
       z-index inherit
-      padding-bottom 5rem
 .layout-editor
   .page-content
-    padding-bottom 5rem
     z-index inherit
 </style>
 
@@ -88,13 +85,14 @@ import itemDefaultStandaloneComponent from '@/components/widgets/standard/defaul
 import itemDefaultListComponent from '@/components/widgets/standard/list/default-list-item'
 import itemDefaultCellComponent from '@/components/widgets/standard/cell/default-cell-item'
 
+import { compareItems } from '@/components/widgets/widget-order'
+
 export default {
   mixins: [PageDesigner],
   components: {
     'editor': () => import('@/components/config/controls/script-editor.vue'),
     OhLayoutPage,
-    PageSettings,
-    ModelPickerPopup
+    PageSettings
   },
   props: ['createMode', 'uid'],
   data () {
@@ -137,7 +135,28 @@ export default {
         const addFromModel = () => {
           this.addFromModelContext = { component, slot, isList, isCells }
           this.modelPickerAllowMultiple = component.component !== 'oh-grid-col'
-          this.modelPickerOpened = true
+          const popup = {
+            component: ModelPickerPopup
+          }
+
+          this.$f7router.navigate({
+            url: 'pick-from-model',
+            route: {
+              path: 'pick-from-model',
+              popup
+            }
+          }, {
+            props: {
+              multiple: this.modelPickerAllowMultiple,
+              popupTitle: 'Add from Model'
+            }
+          })
+
+          this.$f7.once('itemsPicked', this.doAddFromModel)
+          this.$f7.once('modelPickerClosed', () => {
+            this.$f7.off('itemsPicked', this.doAddFromModel)
+          })
+
           this.$nextTick(() => actions.destroy())
         }
         const stdWidgets = (isList) ? StandardListWidgets : (isCells) ? StandardCellWidgets : StandardWidgets
@@ -196,7 +215,7 @@ export default {
       const component = this.addFromModelContext.component
       const slot = this.addFromModelContext.slot
       if (Array.isArray(value)) {
-        value.forEach((i) => {
+        value.sort(compareItems).forEach((i) => {
           component.slots[slot].push(defaultWidgetFn(i))
         })
       } else {
@@ -228,15 +247,17 @@ export default {
     },
     toYaml () {
       this.pageYaml = YAML.stringify({
+        config: this.page.config,
         blocks: this.page.slots.default,
         masonry: this.page.slots.masonry
       })
     },
     fromYaml () {
       try {
-        const updatedSlots = YAML.parse(this.pageYaml)
-        this.$set(this.page.slots, 'default', updatedSlots.blocks)
-        this.$set(this.page.slots, 'masonry', updatedSlots.masonry)
+        const updatedPage = YAML.parse(this.pageYaml)
+        this.$set(this.page, 'config', updatedPage.config)
+        this.$set(this.page.slots, 'default', updatedPage.blocks)
+        this.$set(this.page.slots, 'masonry', updatedPage.masonry)
         this.forceUpdate()
         return true
       } catch (e) {

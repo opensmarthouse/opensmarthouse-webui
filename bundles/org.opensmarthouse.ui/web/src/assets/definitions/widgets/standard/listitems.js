@@ -9,8 +9,9 @@ export const ListItemParameters = () => [
   pt('title', 'Title', 'Title of the item'),
   pt('subtitle', 'Subtitle', 'Subtitle of the item'),
   pt('after', 'After', 'Text to display on the opposite side of the item (set either this or a badge)').a(),
-  pt('icon', 'Icon', 'Use <code>oh:iconName</code> (<a class="external text-color-blue" target="_blank" href="https://www.openhab.org/docs/configuration/iconsets/classic/">openHAB icon</a>) or <code>f7:iconName</code> (<a class="external text-color-blue" target="_blank" href="https://framework7.io/icons/">Framework7 icon</a>)'),
-  pt('iconColor', 'Icon Color', 'Not applicable to openHAB icons').a()
+  pt('icon', 'Icon', 'Use <code>oh:iconName</code> (<a class="external text-color-blue" target="_blank" href="https://www.openhab.org/link/icons">openHAB icon</a>) or <code>f7:iconName</code> (<a class="external text-color-blue" target="_blank" href="https://framework7.io/icons/">Framework7 icon</a>)'),
+  pt('iconColor', 'Icon Color', 'Not applicable to openHAB icons').a(),
+  pb('iconUseState', 'Icon depends on state', 'Use the state of the item to get a dynamic icon (for openHAB icons only)').a()
 ]
 
 // OhListItem
@@ -36,6 +37,12 @@ export const OhLabelItemDefinition = () => new WidgetDefinition('oh-label-item',
   .params([
     pi('item', 'Item', 'Item to display')
   ])
+
+// OhInputItem
+import InputParameters from '../system/input'
+export const OhInputItemDefinition = () => new WidgetDefinition('oh-input-item', 'Input List Item', 'Display an input field in a list')
+  .paramGroup(ListItemParameterGroup(), ListItemParameters())
+  .paramGroup(pg('input', 'Input'), InputParameters())
 
 // OhColorpickerItem
 import ColorPickerParameters from '../system/colorpicker'
@@ -64,7 +71,7 @@ export const OhRollershutterItemDefinition = () => new WidgetDefinition('oh-roll
 
 // OhSliderItem
 import SliderParameters from '../system/slider'
-export const OhSliderItemDefinition = () => new WidgetDefinition('oh-slider-item', 'Slider List Item', 'Display a slider in a Item to control an list')
+export const OhSliderItemDefinition = () => new WidgetDefinition('oh-slider-item', 'Slider List Item', 'Display a slider control in a list')
   .paramGroup(ListItemParameterGroup(), ListItemParameters())
   .paramGroup(pg('slider', 'Slider'), SliderParameters())
 
@@ -76,6 +83,6 @@ export const OhStepperItemDefinition = () => new WidgetDefinition('oh-stepper-it
 
 // OhToggleItem
 import ToggleParameters from '../system/toggle'
-export const OhToggleItemDefinition = () => new WidgetDefinition('oh-toggle-item', 'Toggle List Item', 'Display a toggle switch in a list item')
+export const OhToggleItemDefinition = () => new WidgetDefinition('oh-toggle-item', 'Toggle List Item', 'Display a toggle switch in a list')
   .paramGroup(ListItemParameterGroup(), ListItemParameters())
   .paramGroup(pg('toggle', 'Toggle'), ToggleParameters())

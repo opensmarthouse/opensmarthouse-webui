@@ -31,7 +31,7 @@
             </ul>
           </f7-list>
           </f7-card-content>
-          <f7-card-footer>
+          <f7-card-footer v-if="item && item.editable">
             <f7-button color="red" fill @click="unlinkAndDelete()" v-if="source === 'thing'">Unlink &amp; Remove Item</f7-button>
             <f7-button color="red" @click="unlink()">{{source === 'thing' ? 'Unlink Only' : 'Unlink'}}</f7-button>
           </f7-card-footer>
@@ -41,7 +41,7 @@
         <f7-block-title>Profile</f7-block-title>
         <f7-block-footer class="padding-left padding-right">
           Profiles define how Channels and Items work together. Install transformation add-ons to get additional profiles.
-          <f7-link external color="blue" target="_blank" href="https://www.openhab.org/docs/configuration/items.html#profiles">Learn more about profiles.</f7-link>
+          <f7-link external color="blue" target="_blank" href="https://www.openhab.org/link/profiles">Learn more about profiles.</f7-link>
         <f7-block v-if="!ready" class="text-align-center">
           <f7-preloader></f7-preloader>
           <div>Loading...</div>
@@ -49,7 +49,7 @@
         <f7-list v-else>
           <f7-list-item radio :checked="!currentProfileType" value="" @change="onProfileTypeChange()" title="(No Profile)" name="profile-type" />
           <f7-list-item radio v-for="profileType in profileTypes"
-            :checked="profileType.uid === currentProfileType.uid"
+            :checked="currentProfileType && profileType.uid === currentProfileType.uid"
             @change="onProfileTypeChange(profileType.uid)"
             :key="profileType.uid" :title="profileType.label" name="profile-type"></f7-list-item>
         </f7-list>
@@ -90,7 +90,7 @@ export default {
         configuration: {}
       },
       profileTypes: [],
-      currentProfileType: { uid: '' },
+      currentProfileType: null,
       profileTypeConfiguration: null,
       channelType: {}
     }

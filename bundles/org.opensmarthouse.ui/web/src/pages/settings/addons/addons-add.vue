@@ -2,7 +2,13 @@
   <f7-page @page:afterin="onPageAfterIn" @page:beforeout="addonPopupOpened = false" @page:afterout="stopEventSource">
     <f7-navbar :title="'Add ' + addonType + ' add-ons'" back-link="Back">
       <f7-subnavbar :inner="false" v-show="initSearchbar">
-        <f7-searchbar search-container=".addons-list" :init="initSearchbar" v-if="initSearchbar" search-in=".item-title" remove-diacritics :disable-button="!$theme.aurora"></f7-searchbar>
+        <f7-searchbar
+          search-container=".addons-list"
+          :init="initSearchbar"
+          v-if="initSearchbar"
+          search-in=".item-title"
+          :disable-button="!$theme.aurora"
+        ></f7-searchbar>
       </f7-subnavbar>
     </f7-navbar>
     <f7-list class="searchbar-not-found">
@@ -79,7 +85,7 @@ export default {
     },
     load () {
       this.$oh.api.get('/rest/extensions').then(data => {
-        this.addons = data.filter(addon => !addon.installed && addon.type === this.addonType)
+        this.addons = data.filter(addon => !addon.installed && addon.type === this.addonType).sort((a,b) => a.label.toUpperCase().localeCompare(b.label.toUpperCase()))
         this.ready = true
         setTimeout(() => { this.initSearchbar = true })
         this.startEventSource()
@@ -95,7 +101,6 @@ export default {
     },
     startEventSource () {
       this.eventSource = this.$oh.sse.connect('/rest/events?topics=openhab/extensions/*/*', null, (event) => {
-        console.log(event)
         const topicParts = event.topic.split('/')
         switch (topicParts[3]) {
           case 'installed':

@@ -3,13 +3,13 @@
     <f7-list-item title="Semantic Class" smart-select :smart-select-params="{view: $f7.view.main, searchbar: true, openIn: 'popup', closeOnSelect: true}">
       <select name="select-semantics-class" @change="update('class', $event.target.value)">
         <option v-if="!hideNone" :value="''">None</option>
-        <optgroup label="Locations" v-if="!sameClassOnly || semanticClass === '' || (sameClassOnly && currentSemanticType === 'Location')">
+        <optgroup label="Location" v-if="!sameClassOnly || semanticClass === '' || (sameClassOnly && currentSemanticType === 'Location')">
           <option v-for="type in semanticClasses.Locations" :key="type" :value="type" :selected="type === semanticClass">{{type}}</option>
         </optgroup>
-        <optgroup label="Equipments" v-if="!sameClassOnly || semanticClass === '' || (sameClassOnly && currentSemanticType === 'Equipment')">
+        <optgroup label="Equipment" v-if="!sameClassOnly || semanticClass === '' || (sameClassOnly && currentSemanticType === 'Equipment')">
           <option v-for="type in semanticClasses.Equipments" :key="type" :value="type" :selected="type === semanticClass">{{type}}</option>
         </optgroup>
-        <optgroup label="Points" v-if="!sameClassOnly || semanticClass === '' || (sameClassOnly && currentSemanticType === 'Point')">
+        <optgroup label="Point" v-if="!sameClassOnly || semanticClass === '' || (sameClassOnly && currentSemanticType === 'Point')">
           <option v-for="type in semanticClasses.Points" :key="type" :value="type" :selected="type === semanticClass">{{type}}</option>
         </optgroup>
       </select>
@@ -64,7 +64,6 @@ export default {
     itemChanged (item) {
       this.show = false
       if (!item.tags) return
-      // console.log(item.tags)
       this.semanticClass = ''
       this.semanticProperty = ''
       item.tags.forEach((t) => {

@@ -21,7 +21,7 @@
     <f7-block class="block-narrow after-big-title settings-menu" v-show="addonsLoaded && servicesLoaded">
       <f7-row>
         <f7-col width="100" medium="50">
-          <f7-block-title>Configuration &amp; Automation</f7-block-title>
+          <f7-block-title>Configuration</f7-block-title>
           <f7-list media-list class="search-list">
             <f7-list-item
               v-if="$store.getters.apiEndpoint('things')"
@@ -62,17 +62,26 @@
               :footer="objectsSubtitles.pages">
               <f7-icon slot="media" f7="tv" color="gray"></f7-icon>
             </f7-list-item>
+          </f7-list>
+          <f7-block-title v-if="$store.getters.apiEndpoint('rules')">Automation</f7-block-title>
+          <f7-list media-list class="search-list">
             <f7-list-item
-              v-if="$store.getters.apiEndpoint('rules')"
               media-item
               link="rules/"
               title="Rules"
               badge-color="blue"
               :footer="objectsSubtitles.rules">
-              <f7-icon slot="media" f7="wand_rays" color="gray"></f7-icon>
+              <f7-icon slot="media" f7="wand_stars" color="gray"></f7-icon>
             </f7-list-item>
             <f7-list-item
-              v-if="$store.getters.apiEndpoint('rules')"
+              media-item
+              link="scripts/"
+              title="Scripts"
+              badge-color="blue"
+              :footer="objectsSubtitles.scripts">
+              <f7-icon slot="media" f7="doc_plaintext" color="gray"></f7-icon>
+            </f7-list-item>
+            <f7-list-item
               media-item
               link="schedule/"
               title="Schedule"
@@ -117,6 +126,7 @@
           </f7-list>
         </f7-col>
       </f7-row>
+      <f7-block-footer v-if="$t('home.overview.title') !== 'Overview'" class="margin text-align-center"><small v-t="'admin.notTranslatedYet'"></small></f7-block-footer>
     </f7-block>
   </f7-page>
 </template>
@@ -136,11 +146,12 @@ export default {
         items: 'Manage the functional layer',
         pages: 'Design displays for user control & monitoring',
         rules: 'Automate with triggers and actions',
+        scripts: 'Rules dedicated to running code',
         schedule: 'View upcoming time-based rules'
       },
       addonsSubtitles: {
+        automation: 'Scripting languages and module types for rules',
         binding: 'Connect and control hardware and online services',
-        action: 'Predefined methods for rules and scripts',
         persistence: 'Backend connectors to store historical data',
         transformation: 'Translate between technical and human-readable values',
         misc: 'Integrations to external systems and more',
@@ -148,8 +159,8 @@ export default {
         voice: 'Convert between text and speech, interpret human language queries'
       },
       addonsIcons: {
+        automation: 'sparkles',
         binding: 'circle_grid_hex',
-        action: 'bolt_horizontal',
         persistence: 'download_circle',
         transformation: 'function',
         misc: 'rectangle_3_offgrid',
@@ -198,9 +209,9 @@ export default {
     loadCounters () {
       if (!this.apiEndpoints) return
       if (this.$store.getters.apiEndpoint('inbox')) this.$oh.api.get('/rest/inbox').then((data) => { this.inboxCount = data.filter((e) => e.flag === 'NEW').length.toString() })
-      if (this.$store.getters.apiEndpoint('things')) this.$oh.api.get('/rest/things').then((data) => { this.thingsCount = data.length.toString() })
+      if (this.$store.getters.apiEndpoint('things')) this.$oh.api.get('/rest/things?summary=true').then((data) => { this.thingsCount = data.length.toString() })
       if (this.$store.getters.apiEndpoint('items')) this.$oh.api.get('/rest/items').then((data) => { this.itemsCount = data.length.toString() })
-      if (this.$store.getters.apiEndpoint('ui')) this.$oh.api.get('/rest/ui/components/system:sitemap').then((data) => { this.sitemapsCount = data.length })
+      if (this.$store.getters.apiEndpoint('ui')) this.$oh.api.get('/rest/ui/components/system:sitemap?summary=true').then((data) => { this.sitemapsCount = data.length })
     },
     onPageInit () {
       this.loadMenu()

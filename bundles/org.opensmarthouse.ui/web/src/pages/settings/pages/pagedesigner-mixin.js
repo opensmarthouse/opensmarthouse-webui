@@ -11,7 +11,6 @@ export default {
       pageKey: this.$f7.utils.id(),
       pageYaml: null,
       props: {},
-      vars: {},
       previewMode: false,
       currentTab: 'design',
       clipboard: null,
@@ -31,7 +30,7 @@ export default {
         component: this.page,
         store: this.$store.getters.trackedItems,
         props: this.props,
-        vars: this.vars,
+        vars: (this.page && this.page.config && this.page.config.defineVars) ? this.page.config.defineVars : {},
         editmode: (!this.previewMode || this.forceEditMode) ? {
           addWidget: this.addWidget,
           configureWidget: this.configureWidget,
@@ -199,7 +198,8 @@ export default {
 
       this.currentComponent = component
       const popup = {
-        component: WidgetConfigPopup
+        component: WidgetConfigPopup,
+        componentType: this.type
       }
 
       this.$f7router.navigate({

@@ -8,7 +8,6 @@
           :init="initSearchbar"
           search-container=".binding-list"
           search-in=".item-title, .item-header, .item-footer"
-          remove-diacritics
           :disable-button="!$theme.aurora"
         ></f7-searchbar>
       </f7-subnavbar>
@@ -50,6 +49,7 @@
             badge-color="red"
             :footer="(binding.description && binding.description.indexOf('<br>') >= 0) ?
                       binding.description.split('<br>')[0] : binding.description">
+            <f7-link slot="after" v-if="binding.configDescriptionURI" :href="`/settings/addons/bindings/${binding.id}/config`" class="margin-left" icon-size="20" icon-f7="gear_alt" color="gray" tooltip="Configure Binding" />
           </f7-list-item>
         </f7-list>
 
@@ -95,6 +95,3 @@ export default {
   }
 }
 </script>
-
-<style>
-</style>

@@ -20,12 +20,9 @@
         </f7-block-footer>
         <f7-list v-if="thingId">
           <ul v-if="parentGroup">
-            <item :item="parentGroup" :link="true" @click="modelPickerOpened = true" />
+            <item :item="parentGroup" :link="true" @click="openModelPicker" />
           </ul>
-          <f7-list-item v-else title="Pick From Model" link @click="modelPickerOpened = true" />
-          <model-picker-popup :value="(parentGroup) ? parentGroup.name : null" popup-title="Parent Group"
-            :allow-empty="true" :groups-only="true" :opened="modelPickerOpened"
-            @input="(item) => parentGroup = item" @closed="modelPickerOpened = false" />
+          <f7-list-item v-else title="Pick From Model" link @click="openModelPicker" />
         </f7-list>
         <f7-block-title v-if="selectedThing.statusInfo">Source Thing</f7-block-title>
         <f7-list v-if="selectedThing.statusInfo" media-list>
@@ -62,10 +59,11 @@
               You can alter the suggested names and labels as well as the semantic class and related property.<br/><br/>
               The newly created Points will be linked to their respective channels with the default profile
               (you will be able to configure the links individually later if needed).
+              <f7-link class="display-block margin-top-half" @click="switchToExpertMode" color="blue">Expert Mode</f7-link>
             </f7-block-footer>
             <channel-list :thing="selectedThing" :thingType="selectedThingType" :channelTypes="selectedThingChannelTypes"
               :multiple-links-mode="true" :new-items-prefix="(createEquipment) ? newEquipmentItem.name : (parentGroup) ? parentGroup.name : ''"
-              @selected="(channel) => toggleSelect(channel)" :new-items="newPointItems" />
+              :new-items="newPointItems" />
         </div>
       </f7-col>
     </f7-block>
@@ -80,6 +78,8 @@
 </template>
 
 <script>
+import diacritic from 'diacritic'
+
 import ThingPicker from '@/components/config/controls/thing-picker.vue'
 import ModelPickerPopup from '@/components/model/model-picker-popup.vue'
 import ChannelList from '@/components/thing/channel-list.vue'
@@ -89,11 +89,12 @@ import Item from '@/components/item/item.vue'
 
 import ThingStatus from '@/components/thing/thing-status-mixin'
 
+import generateTextualDefinition from './generate-textual-definition'
+
 export default {
   mixins: [ThingStatus],
   components: {
     Item,
-    ModelPickerPopup,
     ThingPicker,
     ChannelList,
     ItemForm
@@ -108,8 +109,7 @@ export default {
       selectedThingType: {},
       selectedThingChannelTypes: {},
       newEquipmentItem: {},
-      newPointItems: [],
-      modelPickerOpened: false
+      newPointItems: []
     }
   },
   methods: {
@@ -118,8 +118,30 @@ export default {
         this.selectedThingId = this.thingId
       }
     },
-    toggleSelect (channel) {
+    switchToExpertMode () {
+      try {
+        let parentGroupsForEquipment, parentGroupsForPoints
+        if (this.createEquipment) {
+          parentGroupsForEquipment = (this.parentGroup) ? [this.parentGroup.name] : []
+          parentGroupsForPoints = [this.newEquipmentItem.name]
+        } else {
+          parentGroupsForEquipment = []
+          parentGroupsForPoints = (this.parent) ? [this.parent.item.name] : (this.parentGroup) ? [this.parentGroup.name] : []
+        }
 
+        const itemsDefinition = generateTextualDefinition(this.selectedThing, this.selectedThingChannelTypes, (this.createEquipment) ? this.newEquipmentItem : null, parentGroupsForEquipment, parentGroupsForPoints)
+
+        this.$f7router.navigate('/settings/items/add-from-textual-definition', {
+          props: {
+            textualDefinition: itemsDefinition
+          },
+          pushState: false,
+          reloadCurrent: true
+        })
+      } catch (e) {
+        console.error(e)
+        this.$f7.dialog.alert('There was an error generating the items definition: ' + e)
+      }
     },
     add () {
       if (!this.selectedThingId) {
@@ -154,13 +176,14 @@ export default {
       }
 
       let dialog = this.$f7.dialog.progress('Creating the Equipment and Points...')
-      const payload = [this.newEquipmentItem,
-        ...this.newPointItems.map((p) => {
-          let copy = Object.assign({}, p)
-          delete (copy.channel)
-          delete (copy.channelType)
-          return copy
-        })]
+      const payload = [...this.newPointItems.map((p) => {
+        let copy = Object.assign({}, p)
+        delete (copy.channel)
+        delete (copy.channelType)
+        return copy
+      })]
+      if (this.createEquipment) payload.unshift(this.newEquipmentItem)
+
       this.$oh.api.put('/rest/items/', payload).then((data) => {
         dialog.setText('Creating links...')
         dialog.setProgress(50)
@@ -190,6 +213,35 @@ export default {
         console.error(err)
         this.$f7.dialog.alert('An error occurred while creating the items: ' + err)
       })
+    },
+    pickParentFromModel (value) {
+      this.parentGroup = value
+    },
+    openModelPicker () {
+      const popup = {
+        component: ModelPickerPopup
+      }
+
+      this.$f7router.navigate({
+        url: 'pick-from-model',
+        route: {
+          path: 'pick-from-model',
+          popup
+        }
+      }, {
+        props: {
+          value: (this.parentGroup) ? this.parentGroup.name : null,
+          multiple: false,
+          allowEmpty: true,
+          popupTitle: 'Parent Group',
+          groupsOnly: true
+        }
+      })
+
+      this.$f7.once('itemsPicked', this.pickParentFromModel)
+      this.$f7.once('modelPickerClosed', () => {
+        this.$f7.off('itemsPicked', this.pickParentFromModel)
+      })
     }
   },
   watch: {
@@ -211,7 +263,7 @@ export default {
 
           if (this.createEquipment) {
             this.newEquipmentItem = {
-              name: this.selectedThing.label.replace(/[^0-9a-z]/gi, ''),
+              name: diacritic.clean(this.selectedThing.label).replace(/[^0-9a-z]/gi, ''),
               label: this.selectedThing.label,
               tags: ['Equipment'],
               type: 'Group',

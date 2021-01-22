@@ -41,20 +41,35 @@ export default {
         case 'core.GroupCommandTrigger':
           if (!config.groupName && !config.command) return moduleType.label
           if (!config.command) return 'When a member of ' + config.groupName + ' received a command'
-          return 'When a member of ' + config.itemName + ' received command ' + config.command
+          return 'When a member of ' + config.groupName + ' received command ' + config.command
         case 'core.GroupStateUpdateTrigger':
           if (!config.groupName) return moduleType.label
-          return 'When ' + config.groupName + ' was updated' +
+          return 'When a member of ' + config.groupName + ' was updated' +
                         ((config.state) ? ' to ' + config.state : '')
         case 'core.GroupStateChangeTrigger':
           if (!config.groupName) return moduleType.label
           return 'When a member of ' + config.groupName + ' changed' +
               ((config.previousState) ? ' from ' + config.previousState : '') +
               ((config.state) ? ' to ' + config.state : '')
+        case 'core.ThingStatusUpdateTrigger':
+          if (!config.thingUID) return moduleType.label
+          return 'When ' + config.thingUID + ' status was updated' +
+                        ((config.status) ? ' to ' + config.status : '')
+        case 'core.ThingStatusChangeTrigger':
+          if (!config.thingUID) return moduleType.label
+          return 'When ' + config.thingUID + ' changed' +
+              ((config.previousStatus) ? ' from ' + config.previousStatus : '') +
+              ((config.status) ? ' to ' + config.status : '')
+        case 'core.SystemStartlevelTrigger':
+          if (config.startlevel === undefined) return moduleType.label
+          return 'When the system has reached start level ' + config.startlevel
         // actions
         case 'core.ItemCommandAction':
           if (!config.itemName || !config.command) return moduleType.label
           return 'Send command ' + config.command + ' to ' + config.itemName
+        case 'core.ItemStateUpdateAction':
+          if (!config.itemName || !config.state) return moduleType.label
+          return 'Update the state of ' + config.itemName + ' to ' + config.state
         case 'media.SayAction':
           if (!config.text) return moduleType.label
           return 'Say "' + config.text + '"'
@@ -71,7 +86,6 @@ export default {
         case 'core.ItemStateCondition':
           if (!config.itemName || !config.operator || !config.state) return moduleType.label
           return 'If ' + config.itemName + ' ' + config.operator + ' ' + config.state
-
         default:
           return moduleType.label
       }
