@@ -1,7 +1,10 @@
+import { getBasicCredentials } from '@/js/openhab/auth'
+import Framework7 from 'framework7/framework7-lite.esm.bundle.js'
+
 export default {
   getIcon: (icon, format, state) => {
     if (!format) format = 'svg'
-     let url = `/icon/${icon}?format=${format}&anyFormat=true`
+    let url = `/icon/${icon}?format=${format}&anyFormat=true`
     if (state) url += `&state=${encodeURIComponent(state)}`
 
     if (getBasicCredentials()) {
