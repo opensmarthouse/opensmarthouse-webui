@@ -112,9 +112,13 @@ export default {
       this.showAdvanced = !this.showAdvanced // event.target.checked
     },
     updateParameter (parameter, value) {
-      if ((typeof value === 'number' && isNaN(value)) || value === '') {
-        // deleting the parameter sometimes lead to saves not updating it, so set it explicitely to null
-        this.$set(this.configuration, parameter.name, null)
+      if ((typeof value === 'number' && isNaN(value)) || value === '' || value === undefined || value === null || (parameter.multiple && Array.isArray(value) && !value.length)) {
+        if (this.setEmptyConfigAsNull) {
+          // deleting the parameter sometimes lead to saves not updating it, so set it explicitely to null
+          this.$set(this.configuration, parameter.name, null)
+        } else {
+          this.$delete(this.configuration, parameter.name)
+        }
       } else {
         this.$set(this.configuration, parameter.name, value)
       }

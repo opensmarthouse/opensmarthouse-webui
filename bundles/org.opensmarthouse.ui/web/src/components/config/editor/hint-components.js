@@ -15,6 +15,8 @@ import { OhChartPageDefinition } from '@/assets/definitions/widgets/chart/page'
 import ChartWidgetsDefinitions from '@/assets/definitions/widgets/chart/index'
 import { OhLocationCardParameters, OhEquipmentCardParameters, OhPropertyCardParameters } from '@/assets/definitions/widgets/home'
 
+let itemsCache = null
+
 function getWidgetDefinitions (cm) {
   const mode = cm.state.originalMode
   const componentType = (mode.indexOf(';type=') > 0) ? mode.split('=')[1] : undefined
@@ -47,8 +49,9 @@ function getWidgetDefinitions (cm) {
 
 function hintItems (cm, line, replaceAfterColon, addStatePropertySuffix) {
   const cursor = cm.getCursor()
-  if (!cm.state.$oh) return
-  return cm.state.$oh.api.get('/rest/items').then((data) => {
+  const promise = (itemsCache) ? Promise.resolve(itemsCache) : cm.state.$oh.api.get('/rest/items')
+  return promise.then((data) => {
+    if (!itemsCache) itemsCache = data
     let ret = {
       list: data.map((item) => {
         return {
@@ -63,6 +66,9 @@ function hintItems (cm, line, replaceAfterColon, addStatePropertySuffix) {
       const colonPos = line.indexOf(':')
       ret.from = { line: cursor.line, ch: colonPos + 2 }
       ret.to = { line: cursor.line, ch: line.length }
+    } else {
+      const lastDot = line.substring(0, cursor.ch).replace(/\.[A-Za-z0-9_-]*$/, '.')
+      ret.to = { line: cursor.line, ch: lastDot.length }
     }
     addTooltipHandlers(cm, ret)
     return ret
@@ -104,8 +110,9 @@ function hintExpression (cm, line) {
         { text: 'dayjs', displayText: 'dayjs', description: 'Access to the Day.js object for date manipulation & formatting' }
       ]
     }
-  } else if (line[cursor.ch - 1] === '.') {
-    if (line.substring(0, cursor.ch).endsWith('items.')) {
+  } else {
+    const lastDot = line.substring(0, cursor.ch).replace(/\.[A-Za-z0-9_-]*$/, '.')
+    if (lastDot.endsWith('items.')) {
       return hintItems(cm, line, false, true)
     }
   }
