@@ -12,7 +12,7 @@
   <groupId>org.opensmarthouse.ui.features</groupId>
   <artifactId>org.opensmarthouse.ui.features</artifactId>
 
-  <packaging>feature</packaging>
+  <packaging>pom</packaging>
 
   <name>OpenSmartHouse UI | Features</name>
   <description>OpenSmartHouse UI Features</description>
