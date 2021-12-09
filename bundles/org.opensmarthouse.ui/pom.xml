@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.opensmarthouse.ui.bundles</groupId>
     <artifactId>org.opensmarthouse.ui.reactor.bundles</artifactId>
-    <version>0.10.0</version>
+    <version>0.10.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>org.opensmarthouse.ui</artifactId>
