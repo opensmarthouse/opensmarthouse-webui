@@ -131,6 +131,7 @@ Import-Package: \\
   !*.internal.*,\\
   !*.impl.*, \\
   org.openhab.*
+-noimportjava: true
 -sources: false
 -contract: *
 -includeresource: -${.}/NOTICE, -${.}/*.xsd]]></bnd>

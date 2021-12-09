@@ -34,7 +34,7 @@
 
     <f7-list-index
       ref="listIndex"
-      v-show="groupBy === 'alphabetical'"
+      v-show="groupBy === 'alphabetical' && !$device.desktop"
       list-el=".inbox-list"
       :scroll-list="true"
       :label="true"
@@ -47,7 +47,7 @@
           <label @click="toggleIgnored" style="cursor:pointer">Show ignored</label> <f7-checkbox :checked="showIgnored" @change="toggleIgnored"></f7-checkbox>
         </div>
         </f7-block-title>
-        <div class="padding-left padding-right" v-show="!ready || inboxCount > 0">
+        <div class="padding-left padding-right searchbar-found" v-show="!ready || inboxCount > 0">
           <f7-segmented strong tag="p">
             <f7-button :active="groupBy === 'alphabetical'" @click="switchGroupOrder('alphabetical')">Alphabetical</f7-button>
             <f7-button :active="groupBy === 'binding'" @click="switchGroupOrder('binding')">By binding</f7-button>
@@ -164,7 +164,14 @@ export default {
         this.initSearchbar = true
         this.loading = false
         this.ready = true
-        setTimeout(() => { this.$refs.listIndex.update() })
+        setTimeout(() => {
+          this.$refs.listIndex.update()
+          this.$nextTick(() => {
+            if (this.$device.desktop && this.$refs.searchbar) {
+              this.$refs.searchbar.f7Searchbar.$inputEl[0].focus()
+            }
+          })
+        })
       })
     },
     switchGroupOrder (groupBy) {
@@ -236,6 +243,26 @@ export default {
               }
             },
             {
+              text: 'Add as Thing (with custom ID)',
+              color: 'blue',
+              bold: true,
+              onClick: () => {
+                this.$f7.dialog.prompt(`This will create a new Thing of type ${entry.thingTypeUID}. You can change the suggested thing ID below:`,
+                  'Add as Thing',
+                  (newThingId) => {
+                    this.$f7.dialog.prompt(`Enter the desired name of the new Thing:`,
+                      'Add as Thing',
+                      (name) => {
+                        this.approveEntry(entry, name, newThingId)
+                      },
+                      null,
+                      entry.label)
+                  },
+                  null,
+                  entry.thingUID.substring(entry.thingUID.indexOf(':', entry.thingUID.indexOf(':') + 1) + 1))
+              }
+            },
+            {
               text: (!ignored) ? 'Ignore' : 'Unignore',
               color: (!ignored) ? 'orange' : 'blue',
               onClick: () => {
@@ -263,8 +290,8 @@ export default {
 
       actions.open()
     },
-    approveEntry (entry, name) {
-      this.$oh.api.postPlain(`/rest/inbox/${entry.thingUID}/approve`, name).then((res) => {
+    approveEntry (entry, name, newThingId) {
+      this.$oh.api.postPlain(`/rest/inbox/${entry.thingUID}/approve${newThingId ? '?newThingId=' + newThingId : ''}`, name).then((res) => {
         this.$f7.toast.create({
           text: 'Entry approved',
           destroyOnClose: true,
@@ -321,14 +348,14 @@ export default {
           destroyOnClose: true,
           closeTimeout: 2000
         }).open()
-        self.load()
+        this.load()
       }).catch((err) => {
         this.$f7.toast.create({
           text: 'Error while removing entry: ' + err,
           destroyOnClose: true,
           closeTimeout: 2000
         }).open()
-        self.load()
+        this.load()
       })
     },
     toggleIgnored () {

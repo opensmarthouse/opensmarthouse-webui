@@ -8,6 +8,7 @@
       <f7-subnavbar :inner="false" v-show="initSearchbar">
         <f7-searchbar
           v-if="initSearchbar"
+          ref="searchbar"
           class="searchbar-rules"
           :init="initSearchbar"
           search-container=".rules-list"
@@ -35,6 +36,7 @@
     <f7-list-index
       ref="listIndex"
       v-if="$refs.rulesList"
+      v-show="!$device.desktop"
       :listEl="$refs.rulesList ? $$($refs.rulesList.$el) : undefined"
       :scroll-list="true"
       :label="true"
@@ -168,7 +170,12 @@ export default {
         this.ready = true
         setTimeout(() => {
           this.initSearchbar = true
-          this.$refs.listIndex.update()
+          if (this.$refs.listIndex) this.$refs.listIndex.update()
+          this.$nextTick(() => {
+            if (this.$device.desktop && this.$refs.searchbar) {
+              this.$refs.searchbar.f7Searchbar.$inputEl[0].focus()
+            }
+          })
         })
 
         if (!this.eventSource) this.startEventSource()
@@ -211,7 +218,7 @@ export default {
       if (this.showCheckboxes) {
         this.toggleItemCheck(event, item.uid, item)
       } else {
-        this.$f7router.navigate(item.uid)
+        this.$f7router.navigate((item.editable) ? item.uid : '/settings/scripts/' + item.uid)
       }
     },
     ctrlClick (event, item) {

@@ -4,6 +4,7 @@
       <f7-subnavbar :inner="false" v-show="initSearchbar">
         <f7-searchbar
           v-if="initSearchbar"
+          ref="searchbar"
           class="searchbar-things"
           :init="initSearchbar"
           search-container=".binding-list"
@@ -12,13 +13,6 @@
         ></f7-searchbar>
       </f7-subnavbar>
     </f7-navbar>
-
-    <f7-list-index
-      ref="listIndex"
-      list-el=".binding-list"
-      :scroll-list="true"
-      :label="true"
-    ></f7-list-index>
 
     <empty-state-placeholder v-if="ready && !bindings.length" icon="circle_grid_hex" title="things.nobindings.title" text="things.nobindings.text" />
 
@@ -87,6 +81,11 @@ export default {
         this.loading = false
         this.initSearchbar = true
         this.ready = true
+        this.$nextTick(() => {
+          if (this.$device.desktop && this.$refs.searchbar) {
+            this.$refs.searchbar.f7Searchbar.$inputEl[0].focus()
+          }
+        })
       })
       this.$oh.api.get('/rest/inbox').then((data) => {
         this.inbox = data

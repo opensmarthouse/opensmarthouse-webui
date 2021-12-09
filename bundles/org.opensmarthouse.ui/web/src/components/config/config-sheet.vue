@@ -14,6 +14,7 @@
               :value="configurationWithDefaults[parameter.name]"
               :parameters="parameters"
               :configuration="configurationWithDefaults"
+              :read-only="readOnly"
               :status="parameterStatus(parameter)"
               @update="(value) => updateParameter(parameter, value)"
             />
@@ -37,6 +38,7 @@
               :value="configurationWithDefaults[parameter.name]"
               :parameters="parameters"
               :configuration="configurationWithDefaults"
+              :read-only="readOnly"
               :status="parameterStatus(parameter)"
               @update="(value) => updateParameter(parameter, value)"
             />
@@ -70,7 +72,7 @@
 import { actionParams } from '@/assets/definitions/widgets/actions'
 
 export default {
-  props: ['parameterGroups', 'parameters', 'configuration', 'status'],
+  props: ['parameterGroups', 'parameters', 'configuration', 'status', 'readOnly', 'setEmptyConfigAsNull'],
   components: {
     'config-parameter': () => import(/* webpackChunkName: "config-parameter" */ './config-parameter.vue')
   },
@@ -110,9 +112,13 @@ export default {
       this.showAdvanced = !this.showAdvanced // event.target.checked
     },
     updateParameter (parameter, value) {
-      if ((typeof value === 'number' && isNaN(value)) || value === '') {
-        // deleting the parameter sometimes lead to saves not updating it, so set it explicitely to null
-        this.$set(this.configuration, parameter.name, null)
+      if ((typeof value === 'number' && isNaN(value)) || value === '' || value === undefined || value === null || (parameter.multiple && Array.isArray(value) && !value.length)) {
+        if (this.setEmptyConfigAsNull) {
+          // deleting the parameter sometimes lead to saves not updating it, so set it explicitely to null
+          this.$set(this.configuration, parameter.name, null)
+        } else {
+          this.$delete(this.configuration, parameter.name)
+        }
       } else {
         this.$set(this.configuration, parameter.name, value)
       }

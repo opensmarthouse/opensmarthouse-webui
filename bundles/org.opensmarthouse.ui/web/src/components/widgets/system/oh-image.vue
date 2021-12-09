@@ -1,6 +1,6 @@
 <template>
-  <img v-if="config.lazy" ref="lazyImage" v-bind="config" :data-src="src" class="oh-image lazy" :class="{ 'lazy-fade-in': config.lazyFadeIn }" @click="clicked" />
-  <img v-else ref="image" v-bind="config" :src="src" class="oh-image" @click="clicked" />
+  <img v-if="config.lazy" ref="lazyImage" v-bind="config" :data-src="computedSrc" class="oh-image lazy" :class="{ 'lazy-fade-in': config.lazyFadeIn }" @click="clicked" />
+  <img v-else ref="image" v-bind="config" :src="computedSrc" class="oh-image" @click="clicked" />
 </template>
 
 <style lang="stylus">
@@ -18,12 +18,15 @@ export default {
   data () {
     return {
       t: this.$utils.id(),
-      src: null
+      src: null,
+      ts: 0
     }
   },
   watch: {
     url (val) {
-      this.src = this.$oh.media.getImage(val)
+      this.$oh.media.getImage(val).then((url) => {
+        this.src = url
+      })
     },
     src (val) {
       if (this.config.lazy) this.$nextTick(() => { this.$f7.lazy.loadImage(this.$refs.lazyImage) })
@@ -41,14 +44,25 @@ export default {
     itemState () {
       if (this.config.item) return this.$utils.id() + '|' + this.context.store[this.config.item].state
       return null
+    },
+    computedSrc () {
+      return this.ts && this.src ? this.src.indexOf('?') === -1 ? `${this.src}?_ts=${this.ts}` : `${this.src}&_ts=${this.ts}` : this.src
     }
   },
   mounted () {
     if (this.config.item) {
       this.loadItemImage()
     } else {
-      this.src = this.$oh.media.getImage(this.config.url)
+      this.$oh.media.getImage(this.config.url).then((url) => {
+        this.src = url
+      })
     }
+    if (this.config.refreshInterval) {
+      this.refreshInterval = setInterval(() => { this.ts = (new Date()).toISOString() }, this.config.refreshInterval)
+    }
+  },
+  unmounted () {
+    if (this.refreshInterval) clearInterval(this.refreshInterval)
   },
   methods: {
     loadItemImage () {

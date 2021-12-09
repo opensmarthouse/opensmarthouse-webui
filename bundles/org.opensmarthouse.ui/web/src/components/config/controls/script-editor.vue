@@ -49,6 +49,8 @@ import 'codemirror/lib/codemirror.css'
 import 'codemirror/mode/javascript/javascript.js'
 import 'codemirror/mode/clike/clike.js'
 import 'codemirror/mode/groovy/groovy.js'
+import 'codemirror/mode/python/python.js'
+import 'codemirror/mode/ruby/ruby.js'
 import 'codemirror/mode/yaml/yaml.js'
 
 // theme css
@@ -60,6 +62,7 @@ import 'codemirror/addon/edit/closebrackets.js'
 // for autocomplete
 import 'codemirror/addon/hint/show-hint.js'
 import 'codemirror/addon/hint/show-hint.css'
+import 'codemirror/addon/hint/anyword-hint.js'
 import 'codemirror/addon/dialog/dialog.js'
 import 'codemirror/addon/dialog/dialog.css'
 import 'codemirror/addon/tern/tern.js'
@@ -92,6 +95,7 @@ import OpenhabDefs from '@/assets/openhab-tern-defs.json'
 import componentsHint from '../editor/hint-components'
 import rulesHint from '../editor/hint-rules'
 import thingsHint from '../editor/hint-things'
+import pythonHint from '../editor/hint-python'
 
 // Adapted from https://github.com/lkcampbell/brackets-indent-guides (MIT)
 var indentGuidesOverlay = {
@@ -165,6 +169,8 @@ export default {
       if (this.mode && this.mode.indexOf('yaml') >= 0) return 'text/x-yaml'
       if (this.mode && this.mode === 'application/javascript') return 'text/javascript'
       if (this.mode && this.mode === 'application/vnd.openhab.dsl.rule') return 'text/x-java'
+      if (this.mode && this.mode === 'application/python') return 'text/x-python'
+      if (this.mode && this.mode === 'application/x-ruby') return 'text/x-ruby'
       if (this.mode && this.mode === 'application/x-groovy') return 'text/x-groovy'
       return this.mode
     },
@@ -253,6 +259,7 @@ export default {
         if (this.hintContext) cm.state.hintContext = Object.assign({}, this.hintContext)
         cm.setOption('hintOptions', {
           closeOnUnfocus: false,
+          completeSingle: self.mode && self.mode.indexOf('yaml') > 0,
           hint (cm, option) {
             if (self.mode.indexOf('application/vnd.openhab.uicomponent') === 0) {
               return componentsHint(cm, option, self.mode)
@@ -260,6 +267,10 @@ export default {
               return rulesHint(cm, option, self.mode)
             } else if (self.mode === 'application/vnd.openhab.thing+yaml') {
               return thingsHint(cm, option, self.mode)
+            } else if (self.mode === 'application/python') {
+              return pythonHint(cm, option, self.mode)
+            } else {
+              return _CodeMirror.hint.anyword(cm, option, self.mode)
             }
           }
         })

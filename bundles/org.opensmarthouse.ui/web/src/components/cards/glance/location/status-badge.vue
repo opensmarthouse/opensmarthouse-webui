@@ -74,7 +74,11 @@ export default {
         case 'doors':
           equipment =  [
             ...findEquipment(this.element.equipment, 'Equipment_Door', false),
-            ...findEquipment(this.element.equipment, 'Equipment_Door_FrontDoor', false)
+            ...findEquipment(this.element.equipment, 'Equipment_Door_FrontDoor', false),
+            ...findEquipment(this.element.equipment, 'Equipment_Door_BackDoor', false),
+            ...findEquipment(this.element.equipment, 'Equipment_Door_InnerDoor', false),
+            ...findEquipment(this.element.equipment, 'Equipment_Door_CellarDoor', false),
+            ...findEquipment(this.element.equipment, 'Equipment_Door_SideDoor', false)
           ]
           if (!equipment.length) return []
           allPoints = allEquipmentPoints(equipment)
@@ -154,7 +158,9 @@ export default {
           if (points.length) return points
           return equipment.filter((e) => e.points.length === 0).map((e) => e.item)
         case 'alarms':
-          return findPoints(this.element.properties, 'Point_Alarm', true)
+          direct = findPoints(this.element.properties, 'Point_Alarm', true)
+          if (direct.length) return direct
+          return findPoints(allEquipmentPoints(this.element.equipment), 'Point_Alarm', true)
         default:
           return []
       }
@@ -167,7 +173,7 @@ export default {
         case 'lights':
           return this.map.filter((state) => state === 'ON' || (state.split(',').length === 3 && state.split(',')[2] !== '0') || (state.indexOf(',') < 0 && Number.parseInt(state) > 0)).length
         case 'blinds':
-          return this.map.filter((state) => state === 'OPEN' || Number.parseInt(state) > 0).length
+          return this.map.filter((state) => state === 'OPEN' || state === 'ON' || Number.parseInt(state) === 0).length
         default:
           return this.map.filter((state) => state === 'ON' || state === 'OPEN').length
       }

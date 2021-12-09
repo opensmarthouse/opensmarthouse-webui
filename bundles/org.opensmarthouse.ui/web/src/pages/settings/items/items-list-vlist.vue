@@ -8,10 +8,10 @@
       <f7-subnavbar :inner="false" v-show="initSearchbar">
         <f7-searchbar
           v-if="initSearchbar"
+          ref="searchbar"
           class="searchbar-items"
           :init="initSearchbar"
           search-container=".virtual-list"
-          search-in=".item-title, .item-subtitle, .item-footer"
           :disable-button="!$theme.aurora"
         ></f7-searchbar>
       </f7-subnavbar>
@@ -158,7 +158,14 @@ export default {
           this.ready = true
         }
 
-        setTimeout(() => { this.initSearchbar = true })
+        setTimeout(() => {
+          this.initSearchbar = true
+          this.$nextTick(() => {
+            if (this.$device.desktop && this.$refs.searchbar) {
+              this.$refs.searchbar.f7Searchbar.$inputEl[0].focus()
+            }
+          })
+        })
         if (!this.eventSource) this.startEventSource()
       })
     },
@@ -183,7 +190,7 @@ export default {
       for (let i = 0; i < items.length; i += 1) {
         var haystack = items[i].name
         if (items[i].label) haystack += ' ' + items[i].label
-        haystack += this.getItemTypeAndMetaLabel(items[i])
+        haystack += ' ' + this.getItemTypeAndMetaLabel(items[i])
         if (
           haystack.toLowerCase().indexOf(query.toLowerCase()) >= 0 ||
           query.trim() === ''

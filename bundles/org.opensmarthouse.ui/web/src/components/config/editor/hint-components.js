@@ -15,13 +15,15 @@ import { OhChartPageDefinition } from '@/assets/definitions/widgets/chart/page'
 import ChartWidgetsDefinitions from '@/assets/definitions/widgets/chart/index'
 import { OhLocationCardParameters, OhEquipmentCardParameters, OhPropertyCardParameters } from '@/assets/definitions/widgets/home'
 
+let itemsCache = null
+
 function getWidgetDefinitions (cm) {
   const mode = cm.state.originalMode
   const componentType = (mode.indexOf(';type=') > 0) ? mode.split('=')[1] : undefined
   switch (componentType) {
     case 'chart':
       return [
-        OhChartPageDefinition,
+        OhChartPageDefinition(),
         ...Object.keys(ChartWidgetsDefinitions).map((name) => {
           return Object.assign({}, ChartWidgetsDefinitions[name], { name })
         })
@@ -37,15 +39,19 @@ function getWidgetDefinitions (cm) {
       return [
         ...(componentType === 'home') ? [OhLocationCardParameters(), OhEquipmentCardParameters(), OhPropertyCardParameters()] : [],
         ...ohComponents.map((c) => c.widget()).sort((c1, c2) => c1.name.localeCompare(c2.name)),
-        ...f7Components.sort((c1, c2) => c1.name.localeCompare(c2.name))
+        ...f7Components.sort((c1, c2) => c1.name.localeCompare(c2.name)),
+        ...Object.keys(ChartWidgetsDefinitions).map((name) => {
+          return Object.assign({}, ChartWidgetsDefinitions[name], { name })
+        })
       ]
   }
 }
 
 function hintItems (cm, line, replaceAfterColon, addStatePropertySuffix) {
   const cursor = cm.getCursor()
-  if (!cm.state.$oh) return
-  return cm.state.$oh.api.get('/rest/items').then((data) => {
+  const promise = (itemsCache) ? Promise.resolve(itemsCache) : cm.state.$oh.api.get('/rest/items')
+  return promise.then((data) => {
+    if (!itemsCache) itemsCache = data
     let ret = {
       list: data.map((item) => {
         return {
@@ -60,6 +66,9 @@ function hintItems (cm, line, replaceAfterColon, addStatePropertySuffix) {
       const colonPos = line.indexOf(':')
       ret.from = { line: cursor.line, ch: colonPos + 2 }
       ret.to = { line: cursor.line, ch: line.length }
+    } else {
+      const lastDot = line.substring(0, cursor.ch).replace(/\.[A-Za-z0-9_-]*$/, '.')
+      ret.to = { line: cursor.line, ch: lastDot.length }
     }
     addTooltipHandlers(cm, ret)
     return ret
@@ -91,6 +100,7 @@ function hintExpression (cm, line) {
         { text: 'items.', displayText: 'items', description: 'Access to item states' },
         { text: 'props.', displayText: 'props', description: 'Access to the props of the parent root component' },
         { text: 'vars.', displayText: 'vars', description: 'Access to context vars' },
+        { text: 'loop.', displayText: 'loop', description: 'Access to oh-repeater loop variables' },
         { text: 'JSON.', displayText: 'JSON', description: 'Access to the JSON object functions' },
         { text: 'Math.', displayText: 'Math', description: 'Access to the Math object functions' },
         { text: 'Number.', displayText: 'Number', description: 'Access to the Number object functions' },
@@ -100,8 +110,9 @@ function hintExpression (cm, line) {
         { text: 'dayjs', displayText: 'dayjs', description: 'Access to the Day.js object for date manipulation & formatting' }
       ]
     }
-  } else if (line[cursor.ch - 1] === '.') {
-    if (line.substring(0, cursor.ch).endsWith('items.')) {
+  } else {
+    const lastDot = line.substring(0, cursor.ch).replace(/\.[A-Za-z0-9_-]*$/, '.')
+    if (lastDot.endsWith('items.')) {
       return hintItems(cm, line, false, true)
     }
   }
